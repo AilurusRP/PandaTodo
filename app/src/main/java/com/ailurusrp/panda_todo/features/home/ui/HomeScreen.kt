@@ -14,8 +14,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
+import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
 import kotlinx.coroutines.launch
 
 
@@ -26,7 +32,7 @@ fun HomeScreen() {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
+    var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -59,15 +65,16 @@ fun HomeScreen() {
                     },
                     title = { Text("Panda Todo") },
                     actions = {
-                        AddTaskMenuButton()
+                        AddTaskMenuButton({ dialogStatus = it })
                         FilterMenuButton()
                     }
                 )
             }
         ) { innerPadding -> HomeList(innerPadding) }
-    }
-}
 
-enum class FilterMenuOptions(val text: String) {
-    OpenTasks("Open Tasks"), CompletedTasks("Completed Tasks")
+        AddTaskDialog(
+            dialogStatus = dialogStatus,
+            onDialogStatusChange = { dialogStatus = it }
+        )
+    }
 }

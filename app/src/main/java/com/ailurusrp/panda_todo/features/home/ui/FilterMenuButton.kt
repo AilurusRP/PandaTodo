@@ -82,3 +82,7 @@ fun FilterMenuButton() {
         }
     }
 }
+
+enum class FilterMenuOptions(val text: String) {
+    OpenTasks("Open Tasks"), CompletedTasks("Completed Tasks")
+}

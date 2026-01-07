@@ -11,19 +11,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
 
 @Composable
-fun AddTaskMenuButton() {
-    val addMenuExpanded = remember { mutableStateOf(false) }
+fun AddTaskMenuButton(showDialog: (DialogStatus) -> Unit) {
+    var addMenuExpanded by remember { mutableStateOf(false) }
 
     Box {
         IconButton(
-            onClick = { addMenuExpanded.value = true },
+            onClick = { addMenuExpanded = true },
         ) {
             Icon(
                 Icons.Default.Add,
@@ -33,22 +36,31 @@ fun AddTaskMenuButton() {
         }
 
         DropdownMenu(
-            expanded = addMenuExpanded.value,
-            onDismissRequest = { addMenuExpanded.value = false },
+            expanded = addMenuExpanded,
+            onDismissRequest = { addMenuExpanded = false },
             modifier = Modifier.Companion.background(color = Color.Companion.White)
         ) {
             DropdownMenuItem(
-                onClick = {},
+                onClick = {
+                    showDialog(DialogStatus.ShowAddBasicTaskDialog)
+                    addMenuExpanded = false
+                },
                 text = { Text("Basic Task") },
             )
 
             DropdownMenuItem(
-                onClick = {},
+                onClick = {
+                    showDialog(DialogStatus.ShowAddRecurringTaskDialog)
+                    addMenuExpanded = false
+                },
                 text = { Text("Recurring Task") }
             )
 
             DropdownMenuItem(
-                onClick = {},
+                onClick = {
+                    showDialog(DialogStatus.ShowAddTaskWithDeadlineDialog)
+                    addMenuExpanded = false
+                },
                 text = { Text("Task With Deadline") }
             )
         }
