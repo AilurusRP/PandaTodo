@@ -22,10 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
 
 @Composable
-fun AddRecurringTaskDialog(onDialogStatusChange: (DialogStatus?) -> Unit) {
-    BasicAddTaskDialog(onDialogStatusChange, additionalContent = {
+fun AddRecurringTaskDialog(
+    onDialogStatusChange: (DialogStatus?) -> Unit,
+    onTaskAdded: (RecurringTask) -> Unit
+) {
+    BasicAddTaskDialog(onDialogStatusChange, onOk = {}, additionalContent = {
         Spacer(modifier = Modifier.Companion.height(36.dp))
 
         Row(
@@ -69,7 +74,3 @@ fun AddRecurringTaskDialog(onDialogStatusChange: (DialogStatus?) -> Unit) {
     })
 }
 
-enum class ResetInterval(val text: String) {
-    OneDay("1 day"), TwoDays("2 days"), ThreeDays("3 days"),
-    OneWeek("1 week"), TwoWeeks("2 week"), OneMonth("1 month")
-}

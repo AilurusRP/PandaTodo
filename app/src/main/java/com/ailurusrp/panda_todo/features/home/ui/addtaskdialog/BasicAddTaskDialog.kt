@@ -1,5 +1,6 @@
 package com.ailurusrp.panda_todo.features.home.ui.addtaskdialog
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -26,8 +28,11 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun BasicAddTaskDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
+    onOk: (String) -> Unit,
     additionalContent: @Composable () -> Unit = {}
 ) {
+    val newTaskName = rememberTextFieldState(initialText = "")
+
     Dialog(
         onDismissRequest = { onDialogStatusChange(null) }
     ) {
@@ -44,7 +49,7 @@ fun BasicAddTaskDialog(
 
                 Spacer(modifier = Modifier.Companion.height(14.dp))
 
-                DialogTextField()
+                DialogTextField(state = newTaskName)
 
                 additionalContent()
 
@@ -55,7 +60,10 @@ fun BasicAddTaskDialog(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     TextButton(
-                        onClick = { onDialogStatusChange(null) }
+                        onClick = {
+                            onOk(newTaskName.text.toString())
+                            onDialogStatusChange(null)
+                        }
                     ) { Text("Ok", color = Color.Companion.Black) }
 
                     TextButton(
@@ -68,9 +76,7 @@ fun BasicAddTaskDialog(
 }
 
 @Composable
-fun DialogTextField() {
-    val state = rememberTextFieldState()
-
+fun DialogTextField(state: TextFieldState) {
     BasicTextField(
         state = state,
         textStyle = TextStyle(fontSize = 16.sp),

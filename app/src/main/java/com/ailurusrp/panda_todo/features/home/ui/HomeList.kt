@@ -3,12 +3,14 @@ package com.ailurusrp.panda_todo.features.home.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
@@ -27,26 +29,66 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.ui.theme.LightGray
+import io.realm.kotlin.Realm
 
 @Composable
-fun HomeList(innerPadding: PaddingValues) {
+fun HomeList(
+    innerPadding: PaddingValues,
+    basicTaskData: List<BasicTask>,
+    recurringTaskData: List<RecurringTask>,
+    taskWithDeadlineData: List<TaskWithDeadline>
+) {
     LazyColumn(
         modifier = Modifier.Companion
             .padding(innerPadding),
     ) {
-        items(12) {
-            HomeListItem()
+
+        items(
+            basicTaskData
+        ) { task ->
+            BasicTaskItem(task.name)
+            print(task.name)
+        }
+
+        items(recurringTaskData) { task ->
+            val nextRecurrenceDate: Long
+        }
+
+        items(taskWithDeadlineData) { task ->
         }
     }
 }
 
+@Composable
+fun BasicTaskItem(taskName: String) {
+    HomeListItem(taskName)
+}
 
 @Composable
-fun HomeListItem() {
+fun RecurringTaskItem(taskName: String, nextRecurrenceDate: Long) {
+    HomeListItem(taskName, additionalContent = {
+        Text("Next Recurrence Date: $")
+    })
+}
+
+@Composable
+fun TaskWithDeadlineItem(taskName: String) {
+    HomeListItem(taskName, additionalContent = {
+        Text("Deadline: $")
+    })
+}
+
+
+@Composable
+fun HomeListItem(taskName: String, additionalContent: @Composable () -> Unit = {}) {
 
     val taskChecked = remember { mutableStateOf(false) }
-    val menuExpanded = remember() { mutableStateOf(false) }
+    val menuExpanded = remember { mutableStateOf(false) }
 
     Surface(
         color = Color.Companion.White,
@@ -57,47 +99,53 @@ fun HomeListItem() {
             width = 0.1.dp, color = LightGray
         )
     ) {
-        Row(
-            modifier = Modifier.Companion.fillMaxSize(),
-            verticalAlignment = Alignment.Companion.CenterVertically
-        ) {
-            Checkbox(
-                checked = taskChecked.value,
-                onCheckedChange = { taskChecked.value = !taskChecked.value },
-                colors = CheckboxDefaults.colors(checkedColor = Color.Companion.Gray)
-            )
+        Column {
+            Row(
+                modifier = Modifier.Companion.fillMaxSize(),
+                verticalAlignment = Alignment.Companion.CenterVertically
+            ) {
+                Checkbox(
+                    checked = taskChecked.value,
+                    onCheckedChange = { taskChecked.value = !taskChecked.value },
+                    colors = CheckboxDefaults.colors(checkedColor = Color.Companion.Gray)
+                )
 
-            Box(modifier = Modifier.Companion.weight(1f)) {
-                Text("任务 | Task Name", fontSize = 16.sp)
-            }
-
-            Box {
-                IconButton(
-                    onClick = { menuExpanded.value = true }
-                ) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = "More Options"
-                    )
+                Box(modifier = Modifier.Companion.weight(1f)) {
+                    Text(taskName, fontSize = 16.sp)
                 }
 
-                DropdownMenu(
-                    expanded = menuExpanded.value,
-                    onDismissRequest = { menuExpanded.value = false },
-                    modifier = Modifier.Companion.background(color = Color.Companion.White)
-                ) {
-                    DropdownMenuItem(
-                        onClick = {},
-                        text = { Text("Edit Task") },
-                    )
+                Box {
+                    IconButton(
+                        onClick = { menuExpanded.value = true }
+                    ) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "More Options"
+                        )
+                    }
 
-                    DropdownMenuItem(
-                        onClick = {},
-                        text = { Text("Delete Task") }
-                    )
+                    DropdownMenu(
+                        expanded = menuExpanded.value,
+                        onDismissRequest = { menuExpanded.value = false },
+                        modifier = Modifier.Companion.background(color = Color.Companion.White)
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {},
+                            text = { Text("Edit Task") },
+                        )
+
+                        DropdownMenuItem(
+                            onClick = {
+                                val realm = Realm.open(homeDatabaseConfig)
+
+                            },
+                            text = { Text("Delete Task") }
+                        )
+                    }
                 }
             }
+
+            additionalContent()
         }
-
     }
 }

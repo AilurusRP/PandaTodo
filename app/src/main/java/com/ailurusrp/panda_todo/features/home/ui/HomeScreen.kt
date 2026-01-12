@@ -14,14 +14,21 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
+import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.launch
 
 
@@ -33,6 +40,17 @@ fun HomeScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }
+
+    var basicTaskData by remember { mutableStateOf<List<BasicTask>>(listOf()) }
+    var recurringTaskData by remember { mutableStateOf<List<RecurringTask>>(listOf()) }
+    var taskWithDeadlineData by remember { mutableStateOf<List<TaskWithDeadline>>(listOf()) }
+
+    LaunchedEffect(Unit) {
+        val realm = Realm.open(homeDatabaseConfig)
+        basicTaskData = realm.query<BasicTask>().find().toMutableList()
+        recurringTaskData = realm.query<RecurringTask>().find().toMutableList()
+        taskWithDeadlineData = realm.query<TaskWithDeadline>().find().toMutableList()
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -70,11 +88,22 @@ fun HomeScreen() {
                     }
                 )
             }
-        ) { innerPadding -> HomeList(innerPadding) }
+        ) { innerPadding ->
+            HomeList(
+                innerPadding,
+                basicTaskData,
+                recurringTaskData,
+                taskWithDeadlineData
+            )
+        }
 
         AddTaskDialog(
             dialogStatus = dialogStatus,
-            onDialogStatusChange = { dialogStatus = it }
+            onDialogStatusChange = { dialogStatus = it },
+            onBasicTaskAdded = { taskData -> basicTaskData += taskData },
+            onRecurrenceTaskAdded = { taskData -> recurringTaskData += taskData },
+            onTaskWithDeadlineAdded = { taskData -> taskWithDeadlineData += taskData }
         )
     }
 }
+

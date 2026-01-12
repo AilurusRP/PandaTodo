@@ -1,6 +1,5 @@
 package com.ailurusrp.panda_todo.features.home.ui.addtaskdialog
 
-import android.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -31,13 +30,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun AddTaskWithDeadlineDialog(onDialogStatusChange: (DialogStatus?) -> Unit) {
+fun AddTaskWithDeadlineDialog(
+    onDialogStatusChange: (DialogStatus?) -> Unit,
+    onTaskAdded: (TaskWithDeadline) -> Unit
+) {
 
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var selectedDate by remember {
@@ -49,6 +52,7 @@ fun AddTaskWithDeadlineDialog(onDialogStatusChange: (DialogStatus?) -> Unit) {
 
     BasicAddTaskDialog(
         onDialogStatusChange,
+        onOk = {},
         additionalContent = {
             Spacer(
                 modifier = Modifier
@@ -99,6 +103,7 @@ fun AddTaskWithDeadlineDialog(onDialogStatusChange: (DialogStatus?) -> Unit) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
     onDateSelected: (String) -> Unit,
