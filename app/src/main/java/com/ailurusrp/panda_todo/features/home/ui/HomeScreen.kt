@@ -93,7 +93,10 @@ fun HomeScreen() {
                 innerPadding,
                 basicTaskData,
                 recurringTaskData,
-                taskWithDeadlineData
+                taskWithDeadlineData,
+                onDeleteBasicTask = { id -> basicTaskData -= basicTaskData.first { item -> item.id == id } },
+                onDeleteRecurringTask = { id -> recurringTaskData -= recurringTaskData.first { item -> item.id == id } },
+                onDeleteTaskWithDeadline = { id -> taskWithDeadlineData -= taskWithDeadlineData.first { item -> item.id == id } }
             )
         }
 

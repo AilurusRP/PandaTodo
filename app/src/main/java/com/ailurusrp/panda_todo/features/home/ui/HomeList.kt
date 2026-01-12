@@ -32,16 +32,22 @@ import androidx.compose.ui.unit.sp
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.Task
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.ui.theme.LightGray
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.types.RealmUUID
 
 @Composable
 fun HomeList(
     innerPadding: PaddingValues,
     basicTaskData: List<BasicTask>,
     recurringTaskData: List<RecurringTask>,
-    taskWithDeadlineData: List<TaskWithDeadline>
+    taskWithDeadlineData: List<TaskWithDeadline>,
+    onDeleteBasicTask: (RealmUUID) -> Unit,
+    onDeleteRecurringTask: (RealmUUID) -> Unit,
+    onDeleteTaskWithDeadline: (RealmUUID) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.Companion
@@ -51,8 +57,7 @@ fun HomeList(
         items(
             basicTaskData
         ) { task ->
-            BasicTaskItem(task.name)
-            print(task.name)
+            BasicTaskItem(task, onDeleteBasicTask)
         }
 
         items(recurringTaskData) { task ->
@@ -65,27 +70,35 @@ fun HomeList(
 }
 
 @Composable
-fun BasicTaskItem(taskName: String) {
-    HomeListItem(taskName)
+fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
+    HomeListItem(taskData, onDeleteTask = onDeleteTask)
 }
 
 @Composable
-fun RecurringTaskItem(taskName: String, nextRecurrenceDate: Long) {
-    HomeListItem(taskName, additionalContent = {
+fun RecurringTaskItem(
+    taskData: RecurringTask,
+    nextRecurrenceDate: Long,
+    onDeleteTask: (RealmUUID) -> Unit
+) {
+    HomeListItem(taskData, additionalContent = {
         Text("Next Recurrence Date: $")
-    })
+    }, onDeleteTask)
 }
 
 @Composable
-fun TaskWithDeadlineItem(taskName: String) {
-    HomeListItem(taskName, additionalContent = {
+fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -> Unit) {
+    HomeListItem(taskData, additionalContent = {
         Text("Deadline: $")
-    })
+    }, onDeleteTask)
 }
 
 
 @Composable
-fun HomeListItem(taskName: String, additionalContent: @Composable () -> Unit = {}) {
+fun HomeListItem(
+    taskData: Task,
+    additionalContent: @Composable () -> Unit = {},
+    onDeleteTask: (RealmUUID) -> Unit
+) {
 
     val taskChecked = remember { mutableStateOf(false) }
     val menuExpanded = remember { mutableStateOf(false) }
@@ -111,7 +124,7 @@ fun HomeListItem(taskName: String, additionalContent: @Composable () -> Unit = {
                 )
 
                 Box(modifier = Modifier.Companion.weight(1f)) {
-                    Text(taskName, fontSize = 16.sp)
+                    Text(taskData.name, fontSize = 16.sp)
                 }
 
                 Box {
@@ -137,7 +150,12 @@ fun HomeListItem(taskName: String, additionalContent: @Composable () -> Unit = {
                         DropdownMenuItem(
                             onClick = {
                                 val realm = Realm.open(homeDatabaseConfig)
-
+                                realm.writeBlocking {
+                                    val result =
+                                        this.query<BasicTask>("id == $0", taskData.id).find()
+                                    delete(result)
+                                }
+                                onDeleteTask(taskData.id)
                             },
                             text = { Text("Delete Task") }
                         )
