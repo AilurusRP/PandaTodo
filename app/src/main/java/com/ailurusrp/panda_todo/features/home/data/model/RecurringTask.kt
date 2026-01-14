@@ -1,16 +1,20 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
 import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
-import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
 
-
-class RecurringTask : Task, RealmObject {
-    @PrimaryKey
-    override var id: RealmUUID = RealmUUID.random()
-    override var name: String = ""
-    override var creationDate: Long? = null
-    override var completed: Boolean = false
-    var resetInterval: String = ResetInterval.OneDay.name
+class RecurringTask(
+    override var id: RealmUUID,
+    override var name: String,
+    override var creationDate: Long?,
+    override var completed: Boolean,
+    var resetInterval: String
+) : Task{
+    companion object{
+        @JvmStatic
+        fun fromRecurringTaskRealm(data: RecurringTaskRealm): RecurringTask {
+            return RecurringTask(data.id, data.name, data.creationDate, data.completed, data.resetInterval)
+        }
+    }
 }
+

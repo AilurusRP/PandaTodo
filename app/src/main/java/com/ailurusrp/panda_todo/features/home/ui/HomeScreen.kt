@@ -23,14 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.launch
-
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,9 +49,16 @@ fun HomeScreen() {
 
     LaunchedEffect(Unit) {
         val realm = Realm.open(homeDatabaseConfig)
-        basicTaskData = realm.query<BasicTask>().find().toMutableList()
-        recurringTaskData = realm.query<RecurringTask>().find().toMutableList()
-        taskWithDeadlineData = realm.query<TaskWithDeadline>().find().toMutableList()
+        try {
+            basicTaskData = realm.query<BasicTaskRealm>().find().toMutableList()
+                .map { it -> BasicTask.fromBasicTaskRealm(it) }
+            recurringTaskData = realm.query<RecurringTaskRealm>().find().toMutableList()
+                .map { it -> RecurringTask.fromRecurringTaskRealm(it) }
+            taskWithDeadlineData = realm.query<TaskWithDeadlineRealm>().find().toMutableList()
+                .map { it -> TaskWithDeadline.fromTaskWithDeadlineRealm(it) }
+        } finally {
+            realm.close()
+        }
     }
 
     ModalNavigationDrawer(

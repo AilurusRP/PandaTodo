@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import io.realm.kotlin.Realm
 
 @Composable
@@ -16,14 +17,14 @@ fun AddBasicTaskDialog(
     BasicAddTaskDialog(
         onDialogStatusChange,
         onOk = { newTaskName ->
-            val basicTaskData = BasicTask().apply {
+            val basicTaskDataRealm = BasicTaskRealm().apply {
                 name = newTaskName
                 creationDate = System.currentTimeMillis()
             }
 
             try {
-                realm.writeBlocking { copyToRealm(basicTaskData) }
-                onTaskAdded(basicTaskData)
+                realm.writeBlocking { copyToRealm(basicTaskDataRealm) }
+                onTaskAdded(BasicTask.fromBasicTaskRealm(basicTaskDataRealm))
             } finally {
                 realm.close()
             }

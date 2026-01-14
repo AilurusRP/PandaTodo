@@ -1,14 +1,15 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
-import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
-import io.realm.kotlin.types.annotations.PrimaryKey
-import java.time.Instant
 
-class BasicTask : Task, RealmObject {
-    @PrimaryKey
-    override var id: RealmUUID = RealmUUID.random()
-    override var name: String = ""
-    override var creationDate: Long? = null
-    override var completed: Boolean = false
+class BasicTask(
+    override var id: RealmUUID, override var name: String,
+    override var creationDate: Long?, override var completed: Boolean
+) : Task {
+    companion object {
+        @JvmStatic
+        fun fromBasicTaskRealm(data: BasicTaskRealm): BasicTask {
+            return BasicTask(data.id, data.name, data.creationDate, data.completed)
+        }
+    }
 }

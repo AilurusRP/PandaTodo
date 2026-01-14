@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,9 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.Task
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
 import com.ailurusrp.panda_todo.ui.theme.LightGray
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -71,25 +75,46 @@ fun HomeList(
 
 @Composable
 fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
-    HomeListItem(taskData, onDeleteTask = onDeleteTask)
+
+    val taskChecked = remember { mutableStateOf(taskData.completed) }
+
+    HomeListItem(taskData, taskChecked = taskChecked, onCheckedChange = {
+        val realm = Realm.open(homeDatabaseConfig)
+        try {
+            realm.query<BasicTaskRealm>("id == $0", taskData.id).first().find()?.also { task ->
+                realm.writeBlocking {
+                    if (findLatest(task)?.completed != null) {
+                        findLatest(task)?.completed = !findLatest(task)?.completed!!
+                    }
+                }
+            }
+        } finally {
+            realm.close()
+        }
+        taskChecked.value = !taskChecked.value
+    }, onDeleteTask = onDeleteTask)
 }
 
 @Composable
 fun RecurringTaskItem(
-    taskData: RecurringTask,
+    taskData: RecurringTaskRealm,
     nextRecurrenceDate: Long,
     onDeleteTask: (RealmUUID) -> Unit
 ) {
+    val taskChecked = remember { mutableStateOf(taskData.completed) }
+
     HomeListItem(taskData, additionalContent = {
         Text("Next Recurrence Date: $")
-    }, onDeleteTask)
+    }, taskChecked = taskChecked, onCheckedChange = {}, onDeleteTask)
 }
 
 @Composable
-fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -> Unit) {
+fun TaskWithDeadlineItem(taskData: TaskWithDeadlineRealm, onDeleteTask: (RealmUUID) -> Unit) {
+    val taskChecked = remember { mutableStateOf(taskData.completed) }
+
     HomeListItem(taskData, additionalContent = {
         Text("Deadline: $")
-    }, onDeleteTask)
+    }, taskChecked = taskChecked, onCheckedChange = {}, onDeleteTask)
 }
 
 
@@ -97,10 +122,11 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
 fun HomeListItem(
     taskData: Task,
     additionalContent: @Composable () -> Unit = {},
+    taskChecked: MutableState<Boolean>,
+    onCheckedChange: (Boolean) -> Unit,
     onDeleteTask: (RealmUUID) -> Unit
 ) {
 
-    val taskChecked = remember { mutableStateOf(false) }
     val menuExpanded = remember { mutableStateOf(false) }
 
     Surface(
@@ -119,7 +145,7 @@ fun HomeListItem(
             ) {
                 Checkbox(
                     checked = taskChecked.value,
-                    onCheckedChange = { taskChecked.value = !taskChecked.value },
+                    onCheckedChange = onCheckedChange,
                     colors = CheckboxDefaults.colors(checkedColor = Color.Companion.Gray)
                 )
 
@@ -150,11 +176,16 @@ fun HomeListItem(
                         DropdownMenuItem(
                             onClick = {
                                 val realm = Realm.open(homeDatabaseConfig)
-                                realm.writeBlocking {
-                                    val result =
-                                        this.query<BasicTask>("id == $0", taskData.id).find()
-                                    delete(result)
+                                try {
+                                    realm.writeBlocking {
+                                        val result =
+                                            this.query<BasicTaskRealm>("id == $0", taskData.id).find()
+                                        delete(result)
+                                    }
+                                } finally {
+                                    realm.close()
                                 }
+
                                 onDeleteTask(taskData.id)
                             },
                             text = { Text("Delete Task") }

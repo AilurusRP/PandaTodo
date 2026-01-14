@@ -1,6 +1,5 @@
 package com.ailurusrp.panda_todo.features.home.ui.addtaskdialog
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
