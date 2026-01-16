@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
@@ -31,8 +32,7 @@ fun RecurringTaskItem(
 ) {
     val taskChecked = remember { mutableStateOf(taskData.completed) }
 
-    val zone: ZoneId = ZoneId.systemDefault()
-    val creationDate = Instant.ofEpochMilli(taskData.creationDate).atZone(zone)
+    val creationDate = DateUtils.toZonedDateTime(taskData.creationDate)
 
     val nextRecurrenceDate = DateTimeFormatter.ISO_LOCAL_DATE.format(
         when (ResetInterval.valueOf(taskData.resetInterval)) {

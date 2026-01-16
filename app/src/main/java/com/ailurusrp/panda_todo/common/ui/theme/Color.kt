@@ -1,4 +1,4 @@
-package com.ailurusrp.panda_todo.ui.theme
+package com.ailurusrp.panda_todo.common.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

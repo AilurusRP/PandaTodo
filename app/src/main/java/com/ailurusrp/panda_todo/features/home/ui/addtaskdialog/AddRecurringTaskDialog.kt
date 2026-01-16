@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
@@ -42,11 +43,9 @@ fun AddRecurringTaskDialog(
         onDialogStatusChange,
 
         onOk = { newTaskName ->
-            val zone: ZoneId = ZoneId.systemDefault()
             val recurringTaskDataRealm = RecurringTaskRealm().apply {
                 name = newTaskName
-                creationDate =
-                    LocalDate.now(zone).atStartOfDay(zone).plusDays(1).toInstant().toEpochMilli()
+                creationDate = DateUtils.getTodayDate()
                 this.resetInterval = resetInterval.value.toString()
             }
 

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.Task
-import com.ailurusrp.panda_todo.ui.theme.LightGray
+import com.ailurusrp.panda_todo.common.ui.theme.LightGray
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmUUID

@@ -2,10 +2,14 @@ package com.ailurusrp.panda_todo.features.home.ui.addtaskdialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import io.realm.kotlin.Realm
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.TemporalQueries.zone
 
 @Composable
 fun AddBasicTaskDialog(
@@ -20,7 +24,7 @@ fun AddBasicTaskDialog(
         onOk = { newTaskName ->
             val basicTaskDataRealm = BasicTaskRealm().apply {
                 name = newTaskName
-                creationDate = System.currentTimeMillis()
+                creationDate = DateUtils.getTodayDate()
             }
 
             try {
