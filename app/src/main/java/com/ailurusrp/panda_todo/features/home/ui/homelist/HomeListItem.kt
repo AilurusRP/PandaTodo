@@ -1,16 +1,11 @@
-package com.ailurusrp.panda_todo.features.home.ui
+package com.ailurusrp.panda_todo.features.home.ui.homelist
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
@@ -31,92 +26,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
-import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
-import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
-import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.Task
-import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
-import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
 import com.ailurusrp.panda_todo.ui.theme.LightGray
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmUUID
-
-@Composable
-fun HomeList(
-    innerPadding: PaddingValues,
-    basicTaskData: List<BasicTask>,
-    recurringTaskData: List<RecurringTask>,
-    taskWithDeadlineData: List<TaskWithDeadline>,
-    onDeleteBasicTask: (RealmUUID) -> Unit,
-    onDeleteRecurringTask: (RealmUUID) -> Unit,
-    onDeleteTaskWithDeadline: (RealmUUID) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier.Companion
-            .padding(innerPadding),
-    ) {
-
-        items(
-            basicTaskData
-        ) { task ->
-            BasicTaskItem(task, onDeleteBasicTask)
-        }
-
-        items(recurringTaskData) { task ->
-            val nextRecurrenceDate: Long
-        }
-
-        items(taskWithDeadlineData) { task ->
-        }
-    }
-}
-
-@Composable
-fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
-
-    val taskChecked = remember { mutableStateOf(taskData.completed) }
-
-    HomeListItem(taskData, taskChecked = taskChecked, onCheckedChange = {
-        val realm = Realm.open(homeDatabaseConfig)
-        try {
-            realm.query<BasicTaskRealm>("id == $0", taskData.id).first().find()?.also { task ->
-                realm.writeBlocking {
-                    if (findLatest(task)?.completed != null) {
-                        findLatest(task)?.completed = !findLatest(task)?.completed!!
-                    }
-                }
-            }
-        } finally {
-            realm.close()
-        }
-        taskChecked.value = !taskChecked.value
-    }, onDeleteTask = onDeleteTask)
-}
-
-@Composable
-fun RecurringTaskItem(
-    taskData: RecurringTaskRealm,
-    nextRecurrenceDate: Long,
-    onDeleteTask: (RealmUUID) -> Unit
-) {
-    val taskChecked = remember { mutableStateOf(taskData.completed) }
-
-    HomeListItem(taskData, additionalContent = {
-        Text("Next Recurrence Date: $")
-    }, taskChecked = taskChecked, onCheckedChange = {}, onDeleteTask)
-}
-
-@Composable
-fun TaskWithDeadlineItem(taskData: TaskWithDeadlineRealm, onDeleteTask: (RealmUUID) -> Unit) {
-    val taskChecked = remember { mutableStateOf(taskData.completed) }
-
-    HomeListItem(taskData, additionalContent = {
-        Text("Deadline: $")
-    }, taskChecked = taskChecked, onCheckedChange = {}, onDeleteTask)
-}
-
 
 @Composable
 fun HomeListItem(
@@ -132,7 +47,7 @@ fun HomeListItem(
     Surface(
         color = Color.Companion.White,
         modifier = Modifier.Companion
-            .height(65.dp)
+//            .height(65.dp)
             .fillMaxSize(),
         border = BorderStroke(
             width = 0.1.dp, color = LightGray
@@ -175,11 +90,12 @@ fun HomeListItem(
 
                         DropdownMenuItem(
                             onClick = {
-                                val realm = Realm.open(homeDatabaseConfig)
+                                val realm = Realm.Companion.open(homeDatabaseConfig)
                                 try {
                                     realm.writeBlocking {
                                         val result =
-                                            this.query<BasicTaskRealm>("id == $0", taskData.id).find()
+                                            this.query<BasicTaskRealm>("id == $0", taskData.id)
+                                                .find()
                                         delete(result)
                                     }
                                 } finally {

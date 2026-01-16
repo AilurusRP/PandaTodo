@@ -6,7 +6,7 @@ import io.realm.kotlin.types.RealmUUID
 class RecurringTask(
     override var id: RealmUUID,
     override var name: String,
-    override var creationDate: Long?,
+    override var creationDate: Long,
     override var completed: Boolean,
     var resetInterval: String
 ) : Task{

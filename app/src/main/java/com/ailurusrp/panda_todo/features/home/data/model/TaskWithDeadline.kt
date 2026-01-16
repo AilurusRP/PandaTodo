@@ -5,9 +5,9 @@ import io.realm.kotlin.types.RealmUUID
 class TaskWithDeadline(
     override var id: RealmUUID,
     override var name: String,
-    override var creationDate: Long?,
+    override var creationDate: Long,
     override var completed: Boolean,
-    var deadlineDate: Long?
+    var deadlineDate: Long
 ) : Task {
     companion object {
         @JvmStatic

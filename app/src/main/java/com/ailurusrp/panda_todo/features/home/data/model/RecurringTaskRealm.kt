@@ -10,7 +10,7 @@ class RecurringTaskRealm : Task, RealmObject {
     @PrimaryKey
     override var id: RealmUUID = RealmUUID.random()
     override var name: String = ""
-    override var creationDate: Long? = null
+    override var creationDate: Long = 0
     override var completed: Boolean = false
     var resetInterval: String = ResetInterval.OneDay.name
 }

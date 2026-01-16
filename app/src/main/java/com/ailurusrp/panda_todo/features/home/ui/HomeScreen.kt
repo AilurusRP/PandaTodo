@@ -30,6 +30,7 @@ import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
+import com.ailurusrp.panda_todo.features.home.ui.homelist.HomeList
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.launch
@@ -38,7 +39,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }

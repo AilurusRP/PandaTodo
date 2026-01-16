@@ -16,6 +16,7 @@ fun AddBasicTaskDialog(
 
     BasicAddTaskDialog(
         onDialogStatusChange,
+
         onOk = { newTaskName ->
             val basicTaskDataRealm = BasicTaskRealm().apply {
                 name = newTaskName

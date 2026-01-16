@@ -22,55 +22,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
+import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
+import io.realm.kotlin.Realm
+import java.time.LocalDate
+import java.time.ZoneId
 
 @Composable
 fun AddRecurringTaskDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
     onTaskAdded: (RecurringTask) -> Unit
 ) {
-    BasicAddTaskDialog(onDialogStatusChange, onOk = {}, additionalContent = {
-        Spacer(modifier = Modifier.Companion.height(36.dp))
+    val realm = remember(homeDatabaseConfig) { Realm.open(homeDatabaseConfig) }
+    val resetInterval = remember { mutableStateOf(ResetInterval.OneDay) }
 
-        Row(
-            verticalAlignment = Alignment.Companion.CenterVertically,
-            modifier = Modifier.Companion.padding(vertical = 8.dp)
-        ) {
+    BasicAddTaskDialog(
+        onDialogStatusChange,
 
-            var resetInterval by remember { mutableStateOf(ResetInterval.OneDay) }
-            var resetIntervalMenuExpanded by remember { mutableStateOf(false) }
+        onOk = { newTaskName ->
+            val zone: ZoneId = ZoneId.systemDefault()
+            val recurringTaskDataRealm = RecurringTaskRealm().apply {
+                name = newTaskName
+                creationDate =
+                    LocalDate.now(zone).atStartOfDay(zone).plusDays(1).toInstant().toEpochMilli()
+                this.resetInterval = resetInterval.value.toString()
+            }
 
-            Text("Reset interval:", fontSize = 18.sp)
+            try {
+                realm.writeBlocking { copyToRealm(recurringTaskDataRealm) }
+                onTaskAdded(RecurringTask.fromRecurringTaskRealm(recurringTaskDataRealm))
+            } finally {
+                realm.close()
+            }
+        },
 
-            Box {
-                Box(
-                    modifier = Modifier.Companion
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .border(BorderStroke(1.dp, Color.Companion.Black))
-                        .clickable(onClick = { resetIntervalMenuExpanded = true }),
-                    contentAlignment = Alignment.Companion.Center
-                ) {
-                    Text(resetInterval.text, color = Color.Companion.Black)
-                }
+        additionalContent = {
+            Spacer(modifier = Modifier.Companion.height(36.dp))
 
-                DropdownMenu(
-                    expanded = resetIntervalMenuExpanded,
-                    onDismissRequest = { resetIntervalMenuExpanded = false }
-                ) {
-                    ResetInterval.entries.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option.text) },
-                            onClick = {
-                                resetInterval = option
-                                resetIntervalMenuExpanded = false
-                            }
-                        )
+            Row(
+                verticalAlignment = Alignment.Companion.CenterVertically,
+                modifier = Modifier.Companion.padding(vertical = 8.dp)
+            ) {
+                var resetIntervalMenuExpanded by remember { mutableStateOf(false) }
+
+                Text("Reset interval:", fontSize = 18.sp)
+
+                Box {
+                    Box(
+                        modifier = Modifier.Companion
+                            .fillMaxWidth()
+                            .height(32.dp)
+                            .border(BorderStroke(1.dp, Color.Companion.Black))
+                            .clickable(onClick = { resetIntervalMenuExpanded = true }),
+                        contentAlignment = Alignment.Companion.Center
+                    ) {
+                        Text(resetInterval.value.text, color = Color.Companion.Black)
+                    }
+
+                    DropdownMenu(
+                        expanded = resetIntervalMenuExpanded,
+                        onDismissRequest = { resetIntervalMenuExpanded = false }
+                    ) {
+                        ResetInterval.entries.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option.text) },
+                                onClick = {
+                                    resetInterval.value = option
+                                    resetIntervalMenuExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
-    })
+        })
 }
 

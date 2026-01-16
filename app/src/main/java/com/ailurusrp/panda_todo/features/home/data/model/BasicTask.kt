@@ -4,7 +4,7 @@ import io.realm.kotlin.types.RealmUUID
 
 class BasicTask(
     override var id: RealmUUID, override var name: String,
-    override var creationDate: Long?, override var completed: Boolean
+    override var creationDate: Long, override var completed: Boolean
 ) : Task {
     companion object {
         @JvmStatic
