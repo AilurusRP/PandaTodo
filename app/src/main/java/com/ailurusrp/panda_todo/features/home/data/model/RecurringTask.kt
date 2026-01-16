@@ -9,11 +9,17 @@ class RecurringTask(
     override var creationDate: Long,
     override var completed: Boolean,
     var resetInterval: String
-) : Task{
-    companion object{
+) : Task {
+    companion object {
         @JvmStatic
         fun fromRecurringTaskRealm(data: RecurringTaskRealm): RecurringTask {
-            return RecurringTask(data.id, data.name, data.creationDate, data.completed, data.resetInterval)
+            return RecurringTask(
+                data.id,
+                data.name,
+                data.creationDate,
+                data.completed,
+                data.resetInterval
+            )
         }
     }
 }

@@ -4,7 +4,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
 import io.realm.kotlin.types.annotations.PrimaryKey
 
-class TaskWithDeadlineRealm : Task, RealmObject {
+class TaskWithDeadlineRealm : TaskRealm, RealmObject {
     @PrimaryKey
     override var id: RealmUUID = RealmUUID.random()
     override var name: String = ""

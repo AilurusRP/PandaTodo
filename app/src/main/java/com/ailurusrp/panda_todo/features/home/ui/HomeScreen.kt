@@ -103,9 +103,50 @@ fun HomeScreen() {
                 basicTaskData,
                 recurringTaskData,
                 taskWithDeadlineData,
-                onDeleteBasicTask = { id -> basicTaskData -= basicTaskData.first { item -> item.id == id } },
-                onDeleteRecurringTask = { id -> recurringTaskData -= recurringTaskData.first { item -> item.id == id } },
-                onDeleteTaskWithDeadline = { id -> taskWithDeadlineData -= taskWithDeadlineData.first { item -> item.id == id } }
+                onDeleteBasicTask = { id ->
+                    val realm = Realm.Companion.open(homeDatabaseConfig)
+                    try {
+                        realm.writeBlocking {
+                            val result =
+                                this.query<BasicTaskRealm>("id == $0", id)
+                                    .find()
+                            delete(result)
+                        }
+                    } finally {
+                        realm.close()
+                    }
+                    basicTaskData -= basicTaskData.first { item -> item.id == id }
+                },
+
+                onDeleteRecurringTask = { id ->
+                    val realm = Realm.Companion.open(homeDatabaseConfig)
+                    try {
+                        realm.writeBlocking {
+                            val result =
+                                this.query<RecurringTaskRealm>("id == $0", id)
+                                    .find()
+                            delete(result)
+                        }
+                    } finally {
+                        realm.close()
+                    }
+                    recurringTaskData -= recurringTaskData.first { item -> item.id == id }
+                },
+
+                onDeleteTaskWithDeadline = { id ->
+                    val realm = Realm.Companion.open(homeDatabaseConfig)
+                    try {
+                        realm.writeBlocking {
+                            val result =
+                                this.query<TaskWithDeadlineRealm>("id == $0", id)
+                                    .find()
+                            delete(result)
+                        }
+                    } finally {
+                        realm.close()
+                    }
+                    taskWithDeadlineData -= taskWithDeadlineData.first { item -> item.id == id }
+                }
             )
         }
 

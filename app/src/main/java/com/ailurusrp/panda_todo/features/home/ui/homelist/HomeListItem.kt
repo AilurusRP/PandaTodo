@@ -89,21 +89,7 @@ fun HomeListItem(
                         )
 
                         DropdownMenuItem(
-                            onClick = {
-                                val realm = Realm.Companion.open(homeDatabaseConfig)
-                                try {
-                                    realm.writeBlocking {
-                                        val result =
-                                            this.query<BasicTaskRealm>("id == $0", taskData.id)
-                                                .find()
-                                        delete(result)
-                                    }
-                                } finally {
-                                    realm.close()
-                                }
-
-                                onDeleteTask(taskData.id)
-                            },
+                            onClick = { onDeleteTask(taskData.id) },
                             text = { Text("Delete Task") }
                         )
                     }
