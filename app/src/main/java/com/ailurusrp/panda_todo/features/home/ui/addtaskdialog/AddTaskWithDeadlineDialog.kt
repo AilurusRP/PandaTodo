@@ -22,6 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,7 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ailurusrp.panda_todo.common.utils.DateUtils
+import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
+import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
+import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
+import com.ailurusrp.panda_todo.features.home.ui.homelist.TaskWithDeadlineItem
+import io.realm.kotlin.Realm
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -41,18 +49,28 @@ fun AddTaskWithDeadlineDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
     onTaskAdded: (TaskWithDeadline) -> Unit
 ) {
-
     var showDatePickerDialog by remember { mutableStateOf(false) }
-    var selectedDate by remember {
-        mutableStateOf(
-            LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        )
-    }
+    var selectedDate by remember { mutableLongStateOf(DateUtils.toLong(LocalDateTime.now())) }
+    val realm = remember(homeDatabaseConfig) { Realm.open(homeDatabaseConfig) }
 
     BasicAddTaskDialog(
         onDialogStatusChange,
-        onOk = {},
+
+        onOk = { newTaskName ->
+            val taskWithDeadlineRealm = TaskWithDeadlineRealm().apply {
+                name = newTaskName
+                creationDate = DateUtils.getTodayDate()
+                deadlineDate = selectedDate
+            }
+
+            try {
+                realm.writeBlocking { copyToRealm(taskWithDeadlineRealm) }
+                onTaskAdded(TaskWithDeadline.fromTaskWithDeadlineRealm(taskWithDeadlineRealm))
+            } finally {
+                realm.close()
+            }
+        },
+
         additionalContent = {
             Spacer(
                 modifier = Modifier
@@ -78,7 +96,10 @@ fun AddTaskWithDeadlineDialog(
                         .width(120.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(selectedDate.toString(), fontSize = 16.sp)
+                    Text(
+                        DateUtils.format(selectedDate),
+                        fontSize = 16.sp
+                    )
                 }
 
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -96,9 +117,7 @@ fun AddTaskWithDeadlineDialog(
                         onDismiss = { showDatePickerDialog = false }
                     )
                 }
-
             }
-
         }
     )
 }
@@ -106,7 +125,7 @@ fun AddTaskWithDeadlineDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (String) -> Unit,
+    onDateSelected: (Long) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
@@ -117,9 +136,7 @@ fun DatePickerModal(
             TextButton(onClick = {
                 if (datePickerState.selectedDateMillis != null) {
                     onDateSelected(
-                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
-                            datePickerState.selectedDateMillis
-                        )
+                        datePickerState.selectedDateMillis!!
                     )
                 }
                 onDismiss()

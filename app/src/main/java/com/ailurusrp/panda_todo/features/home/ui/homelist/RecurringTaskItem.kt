@@ -21,8 +21,6 @@ import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmUUID
-import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -63,7 +61,6 @@ fun RecurringTaskItem(
                     fontSize = 14.sp, color = Color.Gray
                 )
             }
-
         },
 
         taskChecked = taskChecked,

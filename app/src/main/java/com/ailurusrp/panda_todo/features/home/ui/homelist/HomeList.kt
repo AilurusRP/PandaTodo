@@ -35,6 +35,7 @@ fun HomeList(
         }
 
         items(taskWithDeadlineData) { task ->
+            TaskWithDeadlineItem(task, onDeleteTaskWithDeadline)
         }
     }
 }
