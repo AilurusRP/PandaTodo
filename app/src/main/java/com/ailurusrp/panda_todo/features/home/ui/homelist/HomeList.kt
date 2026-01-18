@@ -29,7 +29,7 @@ fun HomeList(
             RecurringTaskItem(task, onDeleteRecurringTask)
         }
 
-        items(taskWithDeadlineData) { task ->
+        items(taskWithDeadlineData.sortedBy { it.deadlineDate }) { task ->
             TaskWithDeadlineItem(task, onDeleteTaskWithDeadline)
         }
 
