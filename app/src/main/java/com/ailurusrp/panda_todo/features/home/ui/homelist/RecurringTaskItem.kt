@@ -30,23 +30,26 @@ fun RecurringTaskItem(
 ) {
     val taskChecked = remember { mutableStateOf(taskData.completed) }
 
-    val creationDate = DateUtils.toZonedDateTime(taskData.creationDate)
-
-    val nextRecurrenceDate = DateTimeFormatter.ISO_LOCAL_DATE.format(
-        when (ResetInterval.valueOf(taskData.resetInterval)) {
-            ResetInterval.OneDay -> creationDate.plusDays(1)
-            ResetInterval.TwoDays -> creationDate.plusDays(2)
-            ResetInterval.ThreeDays -> creationDate.plusDays(3)
-            ResetInterval.OneWeek -> creationDate.plusDays(7)
-            ResetInterval.TwoWeeks -> creationDate.plusDays(14)
-            ResetInterval.OneMonth -> creationDate.plusMonths(1)
-        }
-    )
+    val nextRecurrenceDate = DateUtils.format(taskData.nextRecurrenceDate)
 
     HomeListItem(
         taskData = taskData,
 
         additionalContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+            ) {
+                Spacer(modifier = Modifier.width(50.dp))
+
+                Text(
+                    "Reset Interval: ${ResetInterval.valueOf(taskData.resetInterval).text}",
+                    modifier = Modifier
+                        .height(24.dp),
+                    fontSize = 14.sp, color = Color.Gray
+                )
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -72,7 +75,14 @@ fun RecurringTaskItem(
                     ?.also { task ->
                         realm.writeBlocking {
                             if (findLatest(task)?.completed != null) {
-                                findLatest(task)?.completed = !findLatest(task)?.completed!!
+                                if (findLatest(task)?.completed == true) {
+                                    findLatest(task)?.completed = false
+                                    findLatest(task)?.completionDate = null
+                                } else {
+                                    findLatest(task)?.completed = true
+                                    findLatest(task)?.completionDate = DateUtils.getTodayDate()
+                                    println(findLatest(task)?.completionDate)
+                                }
                             }
                         }
                     }

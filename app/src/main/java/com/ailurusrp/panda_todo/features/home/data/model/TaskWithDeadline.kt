@@ -7,8 +7,10 @@ class TaskWithDeadline(
     override var name: String,
     override var creationDate: Long,
     override var completed: Boolean,
-    var deadlineDate: Long
+    var deadlineDate: Long,
+    override var completionDate: Long?
 ) : Task {
+
     companion object {
         @JvmStatic
         fun fromTaskWithDeadlineRealm(data: TaskWithDeadlineRealm): TaskWithDeadline {
@@ -17,7 +19,8 @@ class TaskWithDeadline(
                 data.name,
                 data.creationDate,
                 data.completed,
-                data.deadlineDate
+                data.deadlineDate,
+                data.completionDate
             )
         }
     }

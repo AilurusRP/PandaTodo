@@ -7,4 +7,5 @@ interface TaskRealm {
     var name: String
     var creationDate: Long
     var completed: Boolean
+    var completionDate: Long?
 }

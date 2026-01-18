@@ -3,6 +3,7 @@ package com.ailurusrp.panda_todo.features.home.ui.homelist
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
@@ -25,7 +26,13 @@ fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
                 realm.query<BasicTaskRealm>("id == $0", taskData.id).first().find()?.also { task ->
                     realm.writeBlocking {
                         if (findLatest(task)?.completed != null) {
-                            findLatest(task)?.completed = !findLatest(task)?.completed!!
+                            if (findLatest(task)?.completed == true) {
+                                findLatest(task)?.completed = false
+                                findLatest(task)?.completionDate = null
+                            } else {
+                                findLatest(task)?.completed = true
+                                findLatest(task)?.completionDate = DateUtils.getTodayDate()
+                            }
                         }
                     }
                 }

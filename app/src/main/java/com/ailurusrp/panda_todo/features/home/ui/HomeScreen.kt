@@ -1,6 +1,7 @@
 package com.ailurusrp.panda_todo.features.home.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -50,12 +51,26 @@ fun HomeScreen() {
     LaunchedEffect(Unit) {
         val realm = Realm.open(homeDatabaseConfig)
         try {
-            basicTaskData = realm.query<BasicTaskRealm>().find().toMutableList()
-                .map { it -> BasicTask.fromBasicTaskRealm(it) }
             recurringTaskData = realm.query<RecurringTaskRealm>().find().toMutableList()
                 .map { it -> RecurringTask.fromRecurringTaskRealm(it) }
             taskWithDeadlineData = realm.query<TaskWithDeadlineRealm>().find().toMutableList()
                 .map { it -> TaskWithDeadline.fromTaskWithDeadlineRealm(it) }
+            basicTaskData = realm.query<BasicTaskRealm>().find().toMutableList()
+                .map { it -> BasicTask.fromBasicTaskRealm(it) }
+
+            recurringTaskData.forEach { taskData ->
+                if (taskData.needUpdateCompletionStatus) {
+                    taskData.completed = false
+
+                    realm.query<RecurringTaskRealm>("id == $0", taskData.id).first().find()
+                        ?.also { task ->
+                            realm.writeBlocking {
+                                findLatest(task)?.completed = false
+                                findLatest(task)?.completionDate = null
+                            }
+                        }
+                }
+            }
         } finally {
             realm.close()
         }

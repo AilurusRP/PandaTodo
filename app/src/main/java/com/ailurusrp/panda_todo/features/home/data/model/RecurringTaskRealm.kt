@@ -12,5 +12,6 @@ class RecurringTaskRealm : TaskRealm, RealmObject {
     override var name: String = ""
     override var creationDate: Long = 0
     override var completed: Boolean = false
+    override var completionDate: Long? = null
     var resetInterval: String = ResetInterval.OneDay.name
 }

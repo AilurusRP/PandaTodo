@@ -25,17 +25,16 @@ fun HomeList(
         modifier = Modifier.Companion
             .padding(innerPadding),
     ) {
-
-        items(basicTaskData) { task ->
-            BasicTaskItem(task, onDeleteBasicTask)
-        }
-
-        items(recurringTaskData) { task ->
+        items(recurringTaskData.sortedBy { it.nextRecurrenceDate }) { task ->
             RecurringTaskItem(task, onDeleteRecurringTask)
         }
 
         items(taskWithDeadlineData) { task ->
             TaskWithDeadlineItem(task, onDeleteTaskWithDeadline)
+        }
+
+        items(basicTaskData) { task ->
+            BasicTaskItem(task, onDeleteBasicTask)
         }
     }
 }

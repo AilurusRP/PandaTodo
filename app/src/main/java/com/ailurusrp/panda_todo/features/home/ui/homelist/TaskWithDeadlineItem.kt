@@ -51,7 +51,13 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
                     ?.also { task ->
                         realm.writeBlocking {
                             if (findLatest(task)?.completed != null) {
-                                findLatest(task)?.completed = !findLatest(task)?.completed!!
+                                if (findLatest(task)?.completed == true) {
+                                    findLatest(task)?.completed = false
+                                    findLatest(task)?.completionDate = null
+                                } else {
+                                    findLatest(task)?.completed = true
+                                    findLatest(task)?.completionDate = DateUtils.getTodayDate()
+                                }
                             }
                         }
                     }
