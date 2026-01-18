@@ -29,9 +29,11 @@ fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
                             if (findLatest(task)?.completed == true) {
                                 findLatest(task)?.completed = false
                                 findLatest(task)?.completionDate = null
+                                taskChecked.value = false
                             } else {
                                 findLatest(task)?.completed = true
                                 findLatest(task)?.completionDate = DateUtils.getTodayDate()
+                                taskChecked.value = true
                             }
                         }
                     }
@@ -39,7 +41,6 @@ fun BasicTaskItem(taskData: BasicTask, onDeleteTask: (RealmUUID) -> Unit) {
             } finally {
                 realm.close()
             }
-            taskChecked.value = !taskChecked.value
         },
 
         onDeleteTask = onDeleteTask

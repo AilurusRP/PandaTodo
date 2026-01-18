@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
+import com.ailurusrp.panda_todo.features.home.ui.FilterMenuOptions
 import io.realm.kotlin.types.RealmUUID
 
 @Composable
@@ -17,6 +18,7 @@ fun HomeList(
     basicTaskData: List<BasicTask>,
     recurringTaskData: List<RecurringTask>,
     taskWithDeadlineData: List<TaskWithDeadline>,
+    filter: FilterMenuOptions,
     onDeleteBasicTask: (RealmUUID) -> Unit,
     onDeleteRecurringTask: (RealmUUID) -> Unit,
     onDeleteTaskWithDeadline: (RealmUUID) -> Unit
@@ -25,15 +27,41 @@ fun HomeList(
         modifier = Modifier.Companion
             .padding(innerPadding),
     ) {
-        items(recurringTaskData.sortedBy { it.nextRecurrenceDate }) { task ->
+        items(
+            items = recurringTaskData
+                .sortedBy { it.nextRecurrenceDate }
+                .filter { it ->
+                    it.completed == when (filter) {
+                        FilterMenuOptions.OpenTasks -> false
+                        FilterMenuOptions.CompletedTasks -> true
+                    }
+                },
+            key = { task -> task.id.toString() }
+        ) { task ->
             RecurringTaskItem(task, onDeleteRecurringTask)
         }
 
-        items(taskWithDeadlineData.sortedBy { it.deadlineDate }) { task ->
+        items(
+            items = taskWithDeadlineData.sortedBy { it.deadlineDate }.filter { it ->
+                it.completed == when (filter) {
+                    FilterMenuOptions.OpenTasks -> false
+                    FilterMenuOptions.CompletedTasks -> true
+                }
+            },
+            key = { task -> task.id.toString() }
+        ) { task ->
             TaskWithDeadlineItem(task, onDeleteTaskWithDeadline)
         }
 
-        items(basicTaskData) { task ->
+        items(
+            items = basicTaskData.filter { it ->
+                it.completed == when (filter) {
+                    FilterMenuOptions.OpenTasks -> false
+                    FilterMenuOptions.CompletedTasks -> true
+                }
+            },
+            key = { task -> task.id.toString() }
+        ) { task ->
             BasicTaskItem(task, onDeleteBasicTask)
         }
     }

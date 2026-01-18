@@ -1,7 +1,6 @@
 package com.ailurusrp.panda_todo.features.home.ui
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -43,12 +42,13 @@ fun HomeScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }
+    var selectedFilterOption by remember { mutableStateOf(FilterMenuOptions.OpenTasks) }
 
     var basicTaskData by remember { mutableStateOf<List<BasicTask>>(listOf()) }
     var recurringTaskData by remember { mutableStateOf<List<RecurringTask>>(listOf()) }
     var taskWithDeadlineData by remember { mutableStateOf<List<TaskWithDeadline>>(listOf()) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(selectedFilterOption) {
         val realm = Realm.open(homeDatabaseConfig)
         try {
             recurringTaskData = realm.query<RecurringTaskRealm>().find().toMutableList()
@@ -108,7 +108,9 @@ fun HomeScreen() {
                     title = { Text("Panda Todo") },
                     actions = {
                         AddTaskMenuButton({ dialogStatus = it })
-                        FilterMenuButton()
+                        FilterMenuButton(selectedFilterOption, onSelected = { selected ->
+                            selectedFilterOption = selected
+                        })
                     }
                 )
             }
@@ -118,6 +120,7 @@ fun HomeScreen() {
                 basicTaskData,
                 recurringTaskData,
                 taskWithDeadlineData,
+                filter = selectedFilterOption,
                 onDeleteBasicTask = { id ->
                     val realm = Realm.Companion.open(homeDatabaseConfig)
                     try {

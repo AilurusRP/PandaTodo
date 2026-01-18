@@ -26,9 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FilterMenuButton() {
+fun FilterMenuButton(
+    selectedFilterOption: FilterMenuOptions,
+    onSelected: (FilterMenuOptions) -> Unit
+) {
     val filterMenuExpanded = remember { mutableStateOf(false) }
-    val selectedFilterOption = remember { mutableStateOf(FilterMenuOptions.OpenTasks) }
 
     val filterMenuOptions = listOf(FilterMenuOptions.OpenTasks, FilterMenuOptions.CompletedTasks)
 
@@ -59,8 +61,7 @@ fun FilterMenuButton() {
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = LocalIndication.current,
                                     onClick = {
-                                        selectedFilterOption.value =
-                                            filterMenuOption
+                                        onSelected(filterMenuOption)
                                         filterMenuExpanded.value = false
                                     }
                                 ),
@@ -70,7 +71,7 @@ fun FilterMenuButton() {
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color.Gray
                                 ),
-                                selected = selectedFilterOption.value == filterMenuOption,
+                                selected = selectedFilterOption == filterMenuOption,
                                 onClick = {}
                             )
 

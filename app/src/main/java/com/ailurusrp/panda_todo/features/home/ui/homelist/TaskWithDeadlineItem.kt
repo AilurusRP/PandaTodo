@@ -54,9 +54,11 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
                                 if (findLatest(task)?.completed == true) {
                                     findLatest(task)?.completed = false
                                     findLatest(task)?.completionDate = null
+                                    taskChecked.value = false
                                 } else {
                                     findLatest(task)?.completed = true
                                     findLatest(task)?.completionDate = DateUtils.getTodayDate()
+                                    taskChecked.value = true
                                 }
                             }
                         }
@@ -64,8 +66,6 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
             } finally {
                 realm.close()
             }
-
-            taskChecked.value = !taskChecked.value
         },
         onDeleteTask
     )

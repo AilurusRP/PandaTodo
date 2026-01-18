@@ -77,10 +77,11 @@ fun RecurringTaskItem(
                                 if (findLatest(task)?.completed == true) {
                                     findLatest(task)?.completed = false
                                     findLatest(task)?.completionDate = null
+                                    taskChecked.value = false
                                 } else {
                                     findLatest(task)?.completed = true
                                     findLatest(task)?.completionDate = DateUtils.getTodayDate()
-                                    println(findLatest(task)?.completionDate)
+                                    taskChecked.value = true
                                 }
                             }
                         }
@@ -88,8 +89,6 @@ fun RecurringTaskItem(
             } finally {
                 realm.close()
             }
-
-            taskChecked.value = !taskChecked.value
         },
 
         onDeleteTask = onDeleteTask
