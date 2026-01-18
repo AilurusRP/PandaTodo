@@ -8,4 +8,5 @@ interface Task {
     var creationDate: Long
     var completed: Boolean
     var completionDate: Long?
+    var subTasks: List<SubTask>
 }

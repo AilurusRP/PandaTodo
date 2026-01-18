@@ -7,7 +7,8 @@ class BasicTask(
     override var name: String,
     override var creationDate: Long,
     override var completed: Boolean,
-    override var completionDate: Long?
+    override var completionDate: Long?,
+    override var subTasks: List<SubTask>
 ) : Task {
 
     companion object {
@@ -18,7 +19,8 @@ class BasicTask(
                 data.name,
                 data.creationDate,
                 data.completed,
-                data.completionDate
+                data.completionDate,
+                data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
     }

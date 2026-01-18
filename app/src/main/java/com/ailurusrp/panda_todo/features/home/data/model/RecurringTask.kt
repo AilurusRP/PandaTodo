@@ -12,7 +12,8 @@ class RecurringTask(
     override var creationDate: Long,
     override var completed: Boolean,
     var resetInterval: String,
-    override var completionDate: Long?
+    override var completionDate: Long?,
+    override var subTasks: List<SubTask>
 ) : Task {
 
     val nextRecurrenceDate: Long
@@ -114,7 +115,8 @@ class RecurringTask(
                 data.creationDate,
                 data.completed,
                 data.resetInterval,
-                data.completionDate
+                data.completionDate,
+                data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
     }

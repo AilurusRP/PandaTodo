@@ -8,7 +8,8 @@ class TaskWithDeadline(
     override var creationDate: Long,
     override var completed: Boolean,
     var deadlineDate: Long,
-    override var completionDate: Long?
+    override var completionDate: Long?,
+    override var subTasks: List<SubTask>
 ) : Task {
 
     companion object {
@@ -20,7 +21,8 @@ class TaskWithDeadline(
                 data.creationDate,
                 data.completed,
                 data.deadlineDate,
-                data.completionDate
+                data.completionDate,
+                data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
     }

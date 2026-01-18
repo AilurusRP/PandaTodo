@@ -1,5 +1,7 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmUUID
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -11,4 +13,5 @@ class BasicTaskRealm : TaskRealm, RealmObject {
     override var creationDate: Long = 0
     override var completed: Boolean = false
     override var completionDate: Long? = null
+    override var subTasks: RealmList<SubTaskRealm> = realmListOf()
 }
