@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
-import com.ailurusrp.panda_todo.features.home.ui.FilterMenuOptions
+import com.ailurusrp.panda_todo.features.home.ui.HomeViews
 import io.realm.kotlin.types.RealmUUID
 
 @Composable
@@ -18,7 +18,7 @@ fun HomeList(
     basicTaskData: List<BasicTask>,
     recurringTaskData: List<RecurringTask>,
     taskWithDeadlineData: List<TaskWithDeadline>,
-    filter: FilterMenuOptions,
+    filter: HomeViews,
     onDeleteBasicTask: (RealmUUID) -> Unit,
     onDeleteRecurringTask: (RealmUUID) -> Unit,
     onDeleteTaskWithDeadline: (RealmUUID) -> Unit
@@ -32,8 +32,8 @@ fun HomeList(
                 .sortedBy { it.nextRecurrenceDate }
                 .filter { it ->
                     it.completed == when (filter) {
-                        FilterMenuOptions.OpenTasks -> false
-                        FilterMenuOptions.CompletedTasks -> true
+                        HomeViews.OpenTasks -> false
+                        HomeViews.CompletedTasks -> true
                     }
                 },
             key = { task -> task.id.toString() }
@@ -44,8 +44,8 @@ fun HomeList(
         items(
             items = taskWithDeadlineData.sortedBy { it.deadlineDate }.filter { it ->
                 it.completed == when (filter) {
-                    FilterMenuOptions.OpenTasks -> false
-                    FilterMenuOptions.CompletedTasks -> true
+                    HomeViews.OpenTasks -> false
+                    HomeViews.CompletedTasks -> true
                 }
             },
             key = { task -> task.id.toString() }
@@ -56,8 +56,8 @@ fun HomeList(
         items(
             items = basicTaskData.filter { it ->
                 it.completed == when (filter) {
-                    FilterMenuOptions.OpenTasks -> false
-                    FilterMenuOptions.CompletedTasks -> true
+                    HomeViews.OpenTasks -> false
+                    HomeViews.CompletedTasks -> true
                 }
             },
             key = { task -> task.id.toString() }

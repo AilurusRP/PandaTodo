@@ -42,13 +42,13 @@ fun HomeScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }
-    var selectedFilterOption by remember { mutableStateOf(FilterMenuOptions.OpenTasks) }
+    var selectedView by remember { mutableStateOf(HomeViews.OpenTasks) }
 
     var basicTaskData by remember { mutableStateOf<List<BasicTask>>(listOf()) }
     var recurringTaskData by remember { mutableStateOf<List<RecurringTask>>(listOf()) }
     var taskWithDeadlineData by remember { mutableStateOf<List<TaskWithDeadline>>(listOf()) }
 
-    LaunchedEffect(selectedFilterOption) {
+    LaunchedEffect(selectedView) {
         val realm = Realm.open(homeDatabaseConfig)
         try {
             recurringTaskData = realm.query<RecurringTaskRealm>().find().toMutableList()
@@ -78,15 +78,25 @@ fun HomeScreen() {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { Drawer() }
+        drawerContent = {
+            Drawer(
+                selectedView,
+                onSelected = { selected ->
+                    selectedView = selected
+                    scope.launch {
+                        drawerState.apply { close() }
+                    }
+                }
+            )
+        }
     ) {
         Scaffold(
             topBar = {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Companion.Black,
-                        titleContentColor = Color.Companion.White,
-                        actionIconContentColor = Color.Companion.White,
+                        containerColor = Color.Black,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White,
                         navigationIconContentColor = Color.White
                     ),
                     navigationIcon = {
@@ -108,9 +118,6 @@ fun HomeScreen() {
                     title = { Text("Panda Todo") },
                     actions = {
                         AddTaskMenuButton({ dialogStatus = it })
-                        FilterMenuButton(selectedFilterOption, onSelected = { selected ->
-                            selectedFilterOption = selected
-                        })
                     }
                 )
             }
@@ -120,7 +127,7 @@ fun HomeScreen() {
                 basicTaskData,
                 recurringTaskData,
                 taskWithDeadlineData,
-                filter = selectedFilterOption,
+                filter = selectedView,
                 onDeleteBasicTask = { id ->
                     val realm = Realm.Companion.open(homeDatabaseConfig)
                     try {
