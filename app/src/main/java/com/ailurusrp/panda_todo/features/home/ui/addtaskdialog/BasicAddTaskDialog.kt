@@ -35,9 +35,9 @@ fun BasicAddTaskDialog(
     Dialog(
         onDismissRequest = { onDialogStatusChange(null) }
     ) {
-        Card(modifier = Modifier.Companion.width(250.dp)) {
+        Card(modifier = Modifier.width(250.dp)) {
             Column(
-                modifier = Modifier.Companion.padding(
+                modifier = Modifier.padding(
                     top = 24.dp,
                     start = 18.dp,
                     end = 18.dp,
@@ -46,16 +46,16 @@ fun BasicAddTaskDialog(
             ) {
                 Text("Task Name:", fontSize = 20.sp)
 
-                Spacer(modifier = Modifier.Companion.height(14.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 DialogTextField(state = newTaskName)
 
                 additionalContent()
 
-                Spacer(modifier = Modifier.Companion.height(14.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Row(
-                    modifier = Modifier.Companion.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     TextButton(
@@ -63,11 +63,11 @@ fun BasicAddTaskDialog(
                             onOk(newTaskName.text.toString())
                             onDialogStatusChange(null)
                         }
-                    ) { Text("Ok", color = Color.Companion.Black) }
+                    ) { Text("Ok", color = Color.Black) }
 
                     TextButton(
                         onClick = { onDialogStatusChange(null) }
-                    ) { Text("Cancel", color = Color.Companion.Black) }
+                    ) { Text("Cancel", color = Color.Black) }
                 }
             }
         }
@@ -81,13 +81,13 @@ fun DialogTextField(state: TextFieldState) {
         textStyle = TextStyle(fontSize = 16.sp),
         decorator = { innerTextField ->
             Column {
-                Box(modifier = Modifier.Companion.padding(10.dp)) {
+                Box(modifier = Modifier.padding(10.dp)) {
                     innerTextField()
                 }
 
-                Box(modifier = Modifier.Companion.padding(horizontal = 10.dp)) {
+                Box(modifier = Modifier.padding(horizontal = 10.dp)) {
                     Box(
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .height(1.dp)
                             .fillMaxWidth()
                             .background(color = Color.Companion.Black)

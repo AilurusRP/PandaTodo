@@ -16,63 +16,36 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
-import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
-import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
-import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
-import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
-import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
-import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
-import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.DialogStatus
 import com.ailurusrp.panda_todo.features.home.ui.homelist.HomeList
-import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory())) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     val scope = rememberCoroutineScope()
-    var dialogStatus by remember { mutableStateOf<DialogStatus?>(null) }
-    var selectedView by remember { mutableStateOf(HomeViews.OpenTasks) }
 
-    var basicTaskData by remember { mutableStateOf<List<BasicTask>>(listOf()) }
-    var recurringTaskData by remember { mutableStateOf<List<RecurringTask>>(listOf()) }
-    var taskWithDeadlineData by remember { mutableStateOf<List<TaskWithDeadline>>(listOf()) }
+    LaunchedEffect(uiState.isDrawerOpen) {
+        if (uiState.isDrawerOpen) drawerState.open()
+        else drawerState.close()
+    }
 
-    LaunchedEffect(selectedView) {
-        val realm = Realm.open(homeDatabaseConfig)
-        try {
-            recurringTaskData = realm.query<RecurringTaskRealm>().find().toMutableList()
-                .map { it -> RecurringTask.fromRecurringTaskRealm(it) }
-            taskWithDeadlineData = realm.query<TaskWithDeadlineRealm>().find().toMutableList()
-                .map { it -> TaskWithDeadline.fromTaskWithDeadlineRealm(it) }
-            basicTaskData = realm.query<BasicTaskRealm>().find().toMutableList()
-                .map { it -> BasicTask.fromBasicTaskRealm(it) }
-
-            recurringTaskData.forEach { taskData ->
-                if (taskData.needUpdateCompletionStatus) {
-                    taskData.completed = false
-
-                    realm.query<RecurringTaskRealm>("id == $0", taskData.id).first().find()
-                        ?.also { task ->
-                            realm.writeBlocking {
-                                findLatest(task)?.completed = false
-                                findLatest(task)?.completionDate = null
-                            }
-                        }
-                }
+    LaunchedEffect(uiState.selectedView) {
+        uiState.recurringTaskData.forEach { taskData ->
+            if (taskData.needUpdateCompletionStatus) {
+                viewModel.updateRecurringTaskCompletionState(taskData.id, false)
+                viewModel.updateRecurringTaskCompletionDate(taskData.id, null)
             }
-        } finally {
-            realm.close()
         }
     }
 
@@ -80,9 +53,9 @@ fun HomeScreen() {
         drawerState = drawerState,
         drawerContent = {
             Drawer(
-                selectedView,
+                uiState.selectedView,
                 onSelected = { selected ->
-                    selectedView = selected
+                    viewModel.changeSelectedView(selected)
                     scope.launch {
                         drawerState.apply { close() }
                     }
@@ -117,70 +90,23 @@ fun HomeScreen() {
                     },
                     title = { Text("Panda Todo") },
                     actions = {
-                        AddTaskMenuButton({ dialogStatus = it })
+                        AddTaskMenuButton({ viewModel.changeDialogStatus(it) })
                     }
                 )
             }
         ) { innerPadding ->
             HomeList(
                 innerPadding,
-                basicTaskData,
-                recurringTaskData,
-                taskWithDeadlineData,
-                filter = selectedView,
-                onDeleteBasicTask = { id ->
-                    val realm = Realm.Companion.open(homeDatabaseConfig)
-                    try {
-                        realm.writeBlocking {
-                            val result =
-                                this.query<BasicTaskRealm>("id == $0", id)
-                                    .find()
-                            delete(result)
-                        }
-                    } finally {
-                        realm.close()
-                    }
-                    basicTaskData -= basicTaskData.first { item -> item.id == id }
-                },
-
-                onDeleteRecurringTask = { id ->
-                    val realm = Realm.Companion.open(homeDatabaseConfig)
-                    try {
-                        realm.writeBlocking {
-                            val result =
-                                this.query<RecurringTaskRealm>("id == $0", id)
-                                    .find()
-                            delete(result)
-                        }
-                    } finally {
-                        realm.close()
-                    }
-                    recurringTaskData -= recurringTaskData.first { item -> item.id == id }
-                },
-
-                onDeleteTaskWithDeadline = { id ->
-                    val realm = Realm.Companion.open(homeDatabaseConfig)
-                    try {
-                        realm.writeBlocking {
-                            val result =
-                                this.query<TaskWithDeadlineRealm>("id == $0", id)
-                                    .find()
-                            delete(result)
-                        }
-                    } finally {
-                        realm.close()
-                    }
-                    taskWithDeadlineData -= taskWithDeadlineData.first { item -> item.id == id }
-                }
+                uiState.basicTaskData,
+                uiState.recurringTaskData,
+                uiState.taskWithDeadlineData,
+                filter = uiState.selectedView,
             )
         }
 
         AddTaskDialog(
-            dialogStatus = dialogStatus,
-            onDialogStatusChange = { dialogStatus = it },
-            onBasicTaskAdded = { taskData -> basicTaskData += taskData },
-            onRecurrenceTaskAdded = { taskData -> recurringTaskData += taskData },
-            onTaskWithDeadlineAdded = { taskData -> taskWithDeadlineData += taskData }
+            dialogStatus = uiState.dialogStatus,
+            onDialogStatusChange = { viewModel.changeDialogStatus(it) }
         )
     }
 }

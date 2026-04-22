@@ -45,9 +45,8 @@ fun HomeListItem(
     val menuExpanded = remember { mutableStateOf(false) }
 
     Surface(
-        color = Color.Companion.White,
-        modifier = Modifier.Companion
-//            .height(65.dp)
+        color = Color.White,
+        modifier = Modifier
             .fillMaxSize(),
         border = BorderStroke(
             width = 0.1.dp, color = LightGray
@@ -55,16 +54,16 @@ fun HomeListItem(
     ) {
         Column {
             Row(
-                modifier = Modifier.Companion.fillMaxSize(),
-                verticalAlignment = Alignment.Companion.CenterVertically
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
                     checked = taskChecked.value,
                     onCheckedChange = onCheckedChange,
-                    colors = CheckboxDefaults.colors(checkedColor = Color.Companion.Gray)
+                    colors = CheckboxDefaults.colors(checkedColor = Color.Gray)
                 )
 
-                Box(modifier = Modifier.Companion.weight(1f)) {
+                Box(modifier = Modifier.weight(1f)) {
                     Text(taskData.name, fontSize = 16.sp)
                 }
 
@@ -81,7 +80,7 @@ fun HomeListItem(
                     DropdownMenu(
                         expanded = menuExpanded.value,
                         onDismissRequest = { menuExpanded.value = false },
-                        modifier = Modifier.Companion.background(color = Color.Companion.White)
+                        modifier = Modifier.background(color = Color.White)
                     ) {
                         DropdownMenuItem(
                             onClick = {},

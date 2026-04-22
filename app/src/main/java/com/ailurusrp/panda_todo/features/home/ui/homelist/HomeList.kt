@@ -18,19 +18,15 @@ fun HomeList(
     basicTaskData: List<BasicTask>,
     recurringTaskData: List<RecurringTask>,
     taskWithDeadlineData: List<TaskWithDeadline>,
-    filter: HomeViews,
-    onDeleteBasicTask: (RealmUUID) -> Unit,
-    onDeleteRecurringTask: (RealmUUID) -> Unit,
-    onDeleteTaskWithDeadline: (RealmUUID) -> Unit
+    filter: HomeViews
 ) {
     LazyColumn(
-        modifier = Modifier.Companion
-            .padding(innerPadding),
+        modifier = Modifier.padding(innerPadding)
     ) {
         items(
             items = recurringTaskData
                 .sortedBy { it.nextRecurrenceDate }
-                .filter { it ->
+                .filter {
                     it.completed == when (filter) {
                         HomeViews.OpenTasks -> false
                         HomeViews.CompletedTasks -> true
@@ -38,7 +34,7 @@ fun HomeList(
                 },
             key = { task -> task.id.toString() }
         ) { task ->
-            RecurringTaskItem(task, onDeleteRecurringTask)
+            RecurringTaskItem(task)
         }
 
         items(
@@ -50,7 +46,7 @@ fun HomeList(
             },
             key = { task -> task.id.toString() }
         ) { task ->
-            TaskWithDeadlineItem(task, onDeleteTaskWithDeadline)
+            TaskWithDeadlineItem(task)
         }
 
         items(
@@ -62,7 +58,7 @@ fun HomeList(
             },
             key = { task -> task.id.toString() }
         ) { task ->
-            BasicTaskItem(task, onDeleteBasicTask)
+            BasicTaskItem(task)
         }
     }
 }

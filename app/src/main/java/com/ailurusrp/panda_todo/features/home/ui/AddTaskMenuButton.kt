@@ -38,7 +38,7 @@ fun AddTaskMenuButton(showDialog: (DialogStatus) -> Unit) {
         DropdownMenu(
             expanded = addMenuExpanded,
             onDismissRequest = { addMenuExpanded = false },
-            modifier = Modifier.Companion.background(color = Color.Companion.White)
+            modifier = Modifier.background(color = Color.White)
         ) {
             DropdownMenuItem(
                 onClick = {

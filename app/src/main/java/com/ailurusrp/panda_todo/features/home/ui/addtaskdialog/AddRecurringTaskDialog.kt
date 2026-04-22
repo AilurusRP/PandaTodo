@@ -22,21 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
-import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
-import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
-import io.realm.kotlin.Realm
-import java.time.LocalDate
-import java.time.ZoneId
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModel
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModelFactory
 
 @Composable
 fun AddRecurringTaskDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
-    onTaskAdded: (RecurringTask) -> Unit
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory())
 ) {
-    val realm = remember(homeDatabaseConfig) { Realm.open(homeDatabaseConfig) }
     val resetInterval = remember { mutableStateOf(ResetInterval.OneDay) }
 
     BasicAddTaskDialog(
@@ -49,20 +46,15 @@ fun AddRecurringTaskDialog(
                 this.resetInterval = resetInterval.value.toString()
             }
 
-            try {
-                realm.writeBlocking { copyToRealm(recurringTaskDataRealm) }
-                onTaskAdded(RecurringTask.fromRecurringTaskRealm(recurringTaskDataRealm))
-            } finally {
-                realm.close()
-            }
+            viewModel.addRecurringTask(recurringTaskDataRealm)
         },
 
         additionalContent = {
-            Spacer(modifier = Modifier.Companion.height(36.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             Row(
-                verticalAlignment = Alignment.Companion.CenterVertically,
-                modifier = Modifier.Companion.padding(vertical = 8.dp)
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 var resetIntervalMenuExpanded by remember { mutableStateOf(false) }
 
@@ -70,14 +62,14 @@ fun AddRecurringTaskDialog(
 
                 Box {
                     Box(
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .fillMaxWidth()
                             .height(32.dp)
-                            .border(BorderStroke(1.dp, Color.Companion.Black))
+                            .border(BorderStroke(1.dp, Color.Black))
                             .clickable(onClick = { resetIntervalMenuExpanded = true }),
-                        contentAlignment = Alignment.Companion.Center
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(resetInterval.value.text, color = Color.Companion.Black)
+                        Text(resetInterval.value.text, color = Color.Black)
                     }
 
                     DropdownMenu(

@@ -13,16 +13,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModel
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModelFactory
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmUUID
 
 @Composable
-fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -> Unit) {
+fun TaskWithDeadlineItem(
+    taskData: TaskWithDeadline,
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory())
+) {
     val taskChecked = remember { mutableStateOf(taskData.completed) }
 
     HomeListItem(
@@ -45,7 +51,7 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
         },
         taskChecked = taskChecked,
         onCheckedChange = {
-            val realm = Realm.Companion.open(homeDatabaseConfig)
+            val realm = Realm.open(homeDatabaseConfig)
             try {
                 realm.query<TaskWithDeadlineRealm>("id == $0", taskData.id).first().find()
                     ?.also { task ->
@@ -67,6 +73,6 @@ fun TaskWithDeadlineItem(taskData: TaskWithDeadline, onDeleteTask: (RealmUUID) -
                 realm.close()
             }
         },
-        onDeleteTask
+        onDeleteTask = viewModel::deleteTaskWithDeadline
     )
 }

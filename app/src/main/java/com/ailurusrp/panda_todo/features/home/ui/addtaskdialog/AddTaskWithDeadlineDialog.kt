@@ -31,12 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModel
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModelFactory
 import com.ailurusrp.panda_todo.features.home.ui.homelist.TaskWithDeadlineItem
 import io.realm.kotlin.Realm
 import java.text.SimpleDateFormat
@@ -47,11 +50,10 @@ import java.util.Locale
 @Composable
 fun AddTaskWithDeadlineDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
-    onTaskAdded: (TaskWithDeadline) -> Unit
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory())
 ) {
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableLongStateOf(DateUtils.toLong(LocalDateTime.now())) }
-    val realm = remember(homeDatabaseConfig) { Realm.open(homeDatabaseConfig) }
 
     BasicAddTaskDialog(
         onDialogStatusChange,
@@ -63,12 +65,7 @@ fun AddTaskWithDeadlineDialog(
                 deadlineDate = selectedDate
             }
 
-            try {
-                realm.writeBlocking { copyToRealm(taskWithDeadlineRealm) }
-                onTaskAdded(TaskWithDeadline.fromTaskWithDeadlineRealm(taskWithDeadlineRealm))
-            } finally {
-                realm.close()
-            }
+            viewModel.addTaskWithDeadline(taskWithDeadlineRealm)
         },
 
         additionalContent = {

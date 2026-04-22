@@ -1,23 +1,17 @@
 package com.ailurusrp.panda_todo.features.home.ui.addtaskdialog
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
-import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
-import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
-import io.realm.kotlin.Realm
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.temporal.TemporalQueries.zone
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModel
+import com.ailurusrp.panda_todo.features.home.ui.HomeViewModelFactory
 
 @Composable
 fun AddBasicTaskDialog(
     onDialogStatusChange: (DialogStatus?) -> Unit,
-    onTaskAdded: (BasicTask) -> Unit
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory())
 ) {
-    val realm = remember(homeDatabaseConfig) { Realm.open(homeDatabaseConfig) }
-
     BasicAddTaskDialog(
         onDialogStatusChange,
 
@@ -27,12 +21,7 @@ fun AddBasicTaskDialog(
                 creationDate = DateUtils.getTodayDate()
             }
 
-            try {
-                realm.writeBlocking { copyToRealm(basicTaskDataRealm) }
-                onTaskAdded(BasicTask.fromBasicTaskRealm(basicTaskDataRealm))
-            } finally {
-                realm.close()
-            }
+            viewModel.addBasicTask(basicTaskDataRealm)
         }
     )
 }
