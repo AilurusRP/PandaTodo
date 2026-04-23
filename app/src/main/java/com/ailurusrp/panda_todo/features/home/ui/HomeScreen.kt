@@ -91,6 +91,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
                     title = { Text("Panda Todo") },
                     actions = {
                         AddTaskMenuButton({ viewModel.changeDialogStatus(it) })
+                        FilterMenuButton()
                     }
                 )
             }
@@ -100,7 +101,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
                 uiState.basicTaskData,
                 uiState.recurringTaskData,
                 uiState.taskWithDeadlineData,
-                filter = uiState.selectedView,
+                filter = uiState.selectedMenuOptions,
             )
         }
 

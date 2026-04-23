@@ -13,4 +13,5 @@ data class HomeUiState(
     val isDrawerOpen: Boolean = false,
     val dialogStatus: DialogStatus? = null,
     val selectedView: HomeViews = HomeViews.OpenTasks,
+    val selectedMenuOptions: FilterMenuOptions = FilterMenuOptions.OpenTasks
 )

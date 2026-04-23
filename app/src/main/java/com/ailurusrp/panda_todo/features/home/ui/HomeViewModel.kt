@@ -150,6 +150,10 @@ class HomeViewModel(private val repository: TaskRepository) : ViewModel() {
     fun changeSelectedView(newView: HomeViews) {
         _uiState.update { it.copy(selectedView = newView) }
     }
+
+    fun changeSelectedFilterOption(newFilterOption: FilterMenuOptions) {
+        _uiState.update { it.copy(selectedMenuOptions = newFilterOption) }
+    }
 }
 
 class HomeViewModelFactory : ViewModelProvider.Factory {

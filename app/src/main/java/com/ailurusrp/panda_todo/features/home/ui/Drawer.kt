@@ -28,35 +28,6 @@ fun Drawer(selectedView: HomeViews, onSelected: (HomeViews) -> Unit) {
     ModalDrawerSheet(drawerContainerColor = Color.White) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Views", fontSize = 26.sp, fontWeight = FontWeight.Bold)
-
-            Column(modifier = Modifier.padding(14.dp)) {
-
-                viewsOptions.forEach { viewsOption ->
-                    Row(
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = LocalIndication.current,
-                                onClick = {
-                                    onSelected(viewsOption)
-                                }
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = Color.Gray
-                            ),
-                            selected = selectedView == viewsOption,
-                            onClick = null
-                        )
-
-                        Text(viewsOption.text, fontSize = 18.sp)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
         }
     }
 }
