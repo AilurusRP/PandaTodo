@@ -51,17 +51,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            Drawer(
-                uiState.selectedView,
-                onSelected = { selected ->
-                    viewModel.changeSelectedView(selected)
-                    scope.launch {
-                        drawerState.apply { close() }
-                    }
-                }
-            )
-        }
+        drawerContent = { Drawer() }
     ) {
         Scaffold(
             topBar = {
