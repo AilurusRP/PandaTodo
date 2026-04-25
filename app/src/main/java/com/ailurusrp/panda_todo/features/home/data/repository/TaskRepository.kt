@@ -31,6 +31,18 @@ class TaskRepository(
             .map { results -> results.list.map { BasicTask.fromBasicTaskRealm(it) } }
     }
 
+    fun checkRecurringTaskExistenceById(id: RealmUUID): Boolean {
+        return realm.query<RecurringTaskRealm>("id == $0", id).first().find() != null
+    }
+
+    fun checkTaskWithDeadlineExistenceById(id: RealmUUID): Boolean {
+        return realm.query<TaskWithDeadlineRealm>("id == $0", id).first().find() != null
+    }
+
+    fun checkBasicTaskExistenceById(id: RealmUUID): Boolean {
+        return realm.query<BasicTaskRealm>("id == $0", id).first().find() != null
+    }
+
     suspend fun addRecurringTask(task: RecurringTaskRealm) {
         realm.write { copyToRealm(task) }
     }

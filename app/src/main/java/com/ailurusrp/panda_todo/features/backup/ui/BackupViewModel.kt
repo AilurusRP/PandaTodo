@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.io.InputStream
 import java.io.OutputStream
 
 class BackupViewModel(
@@ -21,8 +22,19 @@ class BackupViewModel(
             try {
                 backupRepository.exportBackup(outputStream)
                 _event.emit(BackupEvent.Success("Tasks Successfully Exported!"))
-            } catch (e: Exception) {
-                _event.emit(BackupEvent.Error("Export Failed: ${e.localizedMessage}"))
+            } catch (err: Exception) {
+                _event.emit(BackupEvent.Error("Export Failed: ${err.localizedMessage}"))
+            }
+        }
+    }
+
+    fun importBackup(inputStream: InputStream) {
+        viewModelScope.launch {
+            try {
+                backupRepository.importBackup(inputStream)
+                _event.emit(BackupEvent.Success("Tasks Successfully Imported!"))
+            } catch (err: Exception) {
+                _event.emit(BackupEvent.Error("Import Failed: ${err.localizedMessage}"))
             }
         }
     }

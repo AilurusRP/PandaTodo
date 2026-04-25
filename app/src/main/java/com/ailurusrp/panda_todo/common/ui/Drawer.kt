@@ -72,11 +72,26 @@ fun Drawer() {
         }
     }
 
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                scope.launch {
+                    viewModel.importBackup(inputStream)
+                }
+            } else {
+                errorMessage = "Failed To Import File!"
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
                 is BackupEvent.Success -> {
-                    globalSnackbar.showSnackbar("Tasks Successfully Exported!")
+                    globalSnackbar.showSnackbar(event.message)
                 }
 
                 is BackupEvent.Error -> {
@@ -129,7 +144,7 @@ fun Drawer() {
             ) { Text("Export") }
 
             Button(
-                onClick = {},
+                onClick = { importLauncher.launch(arrayOf("application/json")) },
                 modifier = Modifier.width(100.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.LightGray,

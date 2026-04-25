@@ -15,3 +15,11 @@ class SubTask(var order: Int, var name: String, var completed: Boolean) {
         }
     }
 }
+
+fun SubTask.toSubTaskRealm(): SubTaskRealm {
+    return SubTaskRealm().apply {
+        order = this@toSubTaskRealm.order
+        name = this@toSubTaskRealm.name
+        completed = this@toSubTaskRealm.completed
+    }
+}

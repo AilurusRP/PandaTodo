@@ -1,5 +1,6 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.serialization.Serializable
 
@@ -27,6 +28,19 @@ class TaskWithDeadline(
                 data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
+    }
+}
+
+fun TaskWithDeadline.toTaskWithDeadlineRealm(): TaskWithDeadlineRealm {
+    return TaskWithDeadlineRealm().apply {
+        id = RealmUUID.from(this@toTaskWithDeadlineRealm.id)
+        name = this@toTaskWithDeadlineRealm.name
+        creationDate = this@toTaskWithDeadlineRealm.creationDate
+        completed = this@toTaskWithDeadlineRealm.completed
+        deadlineDate = this@toTaskWithDeadlineRealm.deadlineDate
+        completionDate = this@toTaskWithDeadlineRealm.completionDate
+        subTasks = this@toTaskWithDeadlineRealm.subTasks.map { subTask -> subTask.toSubTaskRealm() }
+            .toRealmList()
     }
 }
 

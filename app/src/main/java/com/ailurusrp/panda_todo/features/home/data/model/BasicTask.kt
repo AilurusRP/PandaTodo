@@ -1,5 +1,7 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
+import com.ailurusrp.panda_todo.common.utils.DateUtils
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.serialization.Serializable
 
@@ -25,5 +27,17 @@ class BasicTask(
                 data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
+    }
+}
+
+fun BasicTask.toBasicTaskRealm(): BasicTaskRealm {
+    return BasicTaskRealm().apply {
+        id = RealmUUID.from(this@toBasicTaskRealm.id)
+        name = this@toBasicTaskRealm.name
+        creationDate = this@toBasicTaskRealm.creationDate
+        completed = this@toBasicTaskRealm.completed
+        completionDate = this@toBasicTaskRealm.creationDate
+        subTasks =
+            this@toBasicTaskRealm.subTasks.map { subTask -> subTask.toSubTaskRealm() }.toRealmList()
     }
 }

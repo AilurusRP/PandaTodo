@@ -3,6 +3,7 @@ package com.ailurusrp.panda_todo.features.home.data.model
 import android.util.Log
 import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmUUID
 import kotlinx.serialization.Serializable
 import java.time.temporal.ChronoUnit
@@ -121,6 +122,19 @@ class RecurringTask(
                 data.subTasks.map { SubTask.fromSubTaskRealm(it) }
             )
         }
+    }
+}
+
+fun RecurringTask.toRecurringTaskRealm(): RecurringTaskRealm {
+    return RecurringTaskRealm().apply {
+        id = RealmUUID.from(this@toRecurringTaskRealm.id)
+        name = this@toRecurringTaskRealm.name
+        creationDate = this@toRecurringTaskRealm.creationDate
+        completed = this@toRecurringTaskRealm.completed
+        resetInterval = this@toRecurringTaskRealm.resetInterval
+        completionDate = this@toRecurringTaskRealm.completionDate
+        subTasks = this@toRecurringTaskRealm.subTasks.map { subTask -> subTask.toSubTaskRealm() }
+            .toRealmList()
     }
 }
 
