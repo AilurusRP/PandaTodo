@@ -4,10 +4,12 @@ import android.util.Log
 import com.ailurusrp.panda_todo.common.utils.DateUtils
 import com.ailurusrp.panda_todo.features.home.domain.ResetInterval
 import io.realm.kotlin.types.RealmUUID
+import kotlinx.serialization.Serializable
 import java.time.temporal.ChronoUnit
 
+@Serializable
 class RecurringTask(
-    override var id: RealmUUID,
+    override var id: String,
     override var name: String,
     override var creationDate: Long,
     override var completed: Boolean,
@@ -110,7 +112,7 @@ class RecurringTask(
         @JvmStatic
         fun fromRecurringTaskRealm(data: RecurringTaskRealm): RecurringTask {
             return RecurringTask(
-                data.id,
+                data.id.toString(),
                 data.name,
                 data.creationDate,
                 data.completed,

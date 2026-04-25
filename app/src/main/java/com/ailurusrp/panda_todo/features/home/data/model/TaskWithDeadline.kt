@@ -1,9 +1,11 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
 import io.realm.kotlin.types.RealmUUID
+import kotlinx.serialization.Serializable
 
+@Serializable
 class TaskWithDeadline(
-    override var id: RealmUUID,
+    override var id: String,
     override var name: String,
     override var creationDate: Long,
     override var completed: Boolean,
@@ -16,7 +18,7 @@ class TaskWithDeadline(
         @JvmStatic
         fun fromTaskWithDeadlineRealm(data: TaskWithDeadlineRealm): TaskWithDeadline {
             return TaskWithDeadline(
-                data.id,
+                data.id.toString(),
                 data.name,
                 data.creationDate,
                 data.completed,

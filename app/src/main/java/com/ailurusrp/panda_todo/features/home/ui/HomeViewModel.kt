@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ailurusrp.panda_todo.common.ui.HomeViews
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
@@ -158,7 +159,7 @@ class HomeViewModel(private val repository: TaskRepository) : ViewModel() {
 
 class HomeViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val realm = Realm.open(homeDatabaseConfig) // 只执行一次
+        val realm = Realm.open(homeDatabaseConfig)
         val repository = TaskRepository(realm)
         @Suppress("UNCHECKED_CAST")
         return HomeViewModel(repository) as T

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.realm.kotlin)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val keystoreProperties = Properties()
@@ -16,13 +17,12 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.ailurusrp.panda_todo"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ailurusrp.panda_todo"
         minSdk = 31
+        //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 2
         versionName = "1.0.1"
@@ -57,6 +57,7 @@ android {
         release {
             resValue("string", "app_name", "Panda Todo")
             isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
 
 //            isMinifyEnabled = false
@@ -88,8 +89,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -99,4 +98,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.realm.kotlin.base)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.serialization.json)
+
 }

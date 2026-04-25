@@ -88,7 +88,7 @@ fun HomeListItem(
                         )
 
                         DropdownMenuItem(
-                            onClick = { onDeleteTask(taskData.id) },
+                            onClick = { onDeleteTask(RealmUUID.from(taskData.id)) },
                             text = { Text("Delete Task") }
                         )
                     }

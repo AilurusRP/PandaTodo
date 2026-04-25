@@ -1,9 +1,11 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
 import io.realm.kotlin.types.RealmUUID
+import kotlinx.serialization.Serializable
 
+@Serializable
 class BasicTask(
-    override var id: RealmUUID,
+    override var id: String,
     override var name: String,
     override var creationDate: Long,
     override var completed: Boolean,
@@ -15,7 +17,7 @@ class BasicTask(
         @JvmStatic
         fun fromBasicTaskRealm(data: BasicTaskRealm): BasicTask {
             return BasicTask(
-                data.id,
+                data.id.toString(),
                 data.name,
                 data.creationDate,
                 data.completed,

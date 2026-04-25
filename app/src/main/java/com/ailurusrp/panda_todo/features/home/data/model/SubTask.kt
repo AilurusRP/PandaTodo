@@ -1,5 +1,8 @@
 package com.ailurusrp.panda_todo.features.home.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class SubTask(var order: Int, var name: String, var completed: Boolean) {
     companion object {
         @JvmStatic

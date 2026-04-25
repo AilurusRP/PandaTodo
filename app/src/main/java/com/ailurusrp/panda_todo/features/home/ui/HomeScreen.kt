@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,8 +21,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ailurusrp.panda_todo.common.ui.Drawer
+import com.ailurusrp.panda_todo.common.ui.LocalSnackbarHostState
 import com.ailurusrp.panda_todo.features.home.ui.addtaskdialog.AddTaskDialog
 import com.ailurusrp.panda_todo.features.home.ui.homelist.HomeList
+import io.realm.kotlin.types.RealmUUID
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -35,6 +39,8 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
 
     val scope = rememberCoroutineScope()
 
+    val globalSnackbar = LocalSnackbarHostState.current
+
     LaunchedEffect(uiState.isDrawerOpen) {
         if (uiState.isDrawerOpen) drawerState.open()
         else drawerState.close()
@@ -43,8 +49,8 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
     LaunchedEffect(uiState.selectedView) {
         uiState.recurringTaskData.forEach { taskData ->
             if (taskData.needUpdateCompletionStatus) {
-                viewModel.updateRecurringTaskCompletionState(taskData.id, false)
-                viewModel.updateRecurringTaskCompletionDate(taskData.id, null)
+                viewModel.updateRecurringTaskCompletionState(RealmUUID.from(taskData.id), false)
+                viewModel.updateRecurringTaskCompletionDate(RealmUUID.from(taskData.id), null)
             }
         }
     }
@@ -54,6 +60,8 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModelFacto
         drawerContent = { Drawer() }
     ) {
         Scaffold(
+            snackbarHost = { SnackbarHost(globalSnackbar) },
+
             topBar = {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
