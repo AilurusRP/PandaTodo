@@ -40,6 +40,8 @@ import androidx.navigation.NavController
 import com.ailurusrp.panda_todo.features.backup.data.BackupRepository
 import com.ailurusrp.panda_todo.features.backup.ui.BackupEvent
 import com.ailurusrp.panda_todo.features.backup.ui.BackupViewModel
+import com.ailurusrp.panda_todo.features.dailyreport.data.DailyReportRepository
+import com.ailurusrp.panda_todo.features.dailyreport.data.dailyReportDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.repository.TaskRepository
 import io.realm.kotlin.Realm
@@ -52,6 +54,9 @@ fun Drawer(currentView: Views, navController: NavController) {
             BackupRepository(
                 taskRepository = TaskRepository(
                     realm = Realm.open(homeDatabaseConfig)
+                ),
+                dailyReportRepository = DailyReportRepository(
+                    realm = Realm.open(dailyReportDatabaseConfig)
                 )
             )
         )

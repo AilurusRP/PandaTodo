@@ -1,5 +1,7 @@
 package com.ailurusrp.panda_todo.features.backup.data
 
+import com.ailurusrp.panda_todo.features.dailyreport.data.DailyReportRepository
+import com.ailurusrp.panda_todo.features.dailyreport.data.model.toDailyReportRealm
 import com.ailurusrp.panda_todo.features.home.data.model.toBasicTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.toRecurringTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.toTaskWithDeadlineRealm
@@ -14,7 +16,8 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class BackupRepository(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val dailyReportRepository: DailyReportRepository
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -23,11 +26,13 @@ class BackupRepository(
             val basicTasks = taskRepository.getBasicTasks().first()
             val recurringTasks = taskRepository.getRecurringTasks().first()
             val tasksWithDeadline = taskRepository.getTasksWithDeadlines().first()
+            val dailyReports = dailyReportRepository.getAllDailyReports()
 
             val backupData = BackupData(
                 basicTasks = basicTasks,
                 recurringTasks = recurringTasks,
-                tasksWithDeadline = tasksWithDeadline
+                tasksWithDeadline = tasksWithDeadline,
+                dailyReports = dailyReports
             )
 
             val jsonString = json.encodeToString(backupData)
@@ -63,6 +68,12 @@ class BackupRepository(
                 )
             }.forEach { task ->
                 taskRepository.addBasicTask(task.toBasicTaskRealm())
+            }
+
+            backupData.dailyReports.filter { dailyReport ->
+                !dailyReportRepository.checkDailyReportExistenceByDate(dailyReport.creationDate)
+            }.forEach { dailyReport ->
+                dailyReportRepository.addDailyReport(dailyReport.toDailyReportRealm())
             }
         }
     }
