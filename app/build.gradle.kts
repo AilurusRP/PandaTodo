@@ -16,16 +16,16 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.ailurusrp.panda_todo"
+    namespace = "io.github.ailurusrp.panda_todo"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ailurusrp.panda_todo"
+        applicationId = "io.github.ailurusrp.panda_todo"
         minSdk = 31
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

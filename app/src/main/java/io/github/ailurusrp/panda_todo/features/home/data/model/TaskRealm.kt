@@ -1,0 +1,13 @@
+package io.github.ailurusrp.panda_todo.features.home.data.model
+
+import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.RealmUUID
+
+interface TaskRealm {
+    var id: RealmUUID
+    var name: String
+    var creationDate: Long
+    var completed: Boolean
+    var completionDate: Long?
+    var subTasks: RealmList<SubTaskRealm>
+}
