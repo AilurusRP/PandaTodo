@@ -1,6 +1,5 @@
 package com.ailurusrp.panda_todo.features.home.ui
 
-import com.ailurusrp.panda_todo.common.ui.HomeViews
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
@@ -13,6 +12,5 @@ data class HomeUiState(
 
     val isDrawerOpen: Boolean = false,
     val dialogStatus: DialogStatus? = null,
-    val selectedView: HomeViews = HomeViews.OpenTasks,
     val selectedMenuOptions: FilterMenuOptions = FilterMenuOptions.OpenTasks
 )

@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
+import com.ailurusrp.panda_todo.features.dailyreport.ui.DailyReportViewModel
+import com.ailurusrp.panda_todo.features.dailyreport.ui.DailyReportViewModelFactory
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTaskRealm
@@ -33,6 +35,9 @@ fun RecurringTaskItem(
     val taskChecked = remember { mutableStateOf(taskData.completed) }
 
     val nextRecurrenceDate = DateUtils.format(taskData.nextRecurrenceDate)
+
+    val dailyReportViewModel: DailyReportViewModel =
+        viewModel(factory = DailyReportViewModelFactory())
 
     HomeListItem(
         taskData = taskData,
@@ -71,9 +76,27 @@ fun RecurringTaskItem(
         taskChecked = taskChecked,
 
         onCheckedChange = {
+            if (taskChecked.value) {
+                dailyReportViewModel.deleteCompletedTaskFromDailyReport(
+                    DateUtils.format(
+                        DateUtils.getTodayDate()
+                    ), taskData.name
+                )
+
+            } else {
+                dailyReportViewModel.addNewCompletedTaskToDailyReportOrAddDailyReport(
+                    DateUtils.format(
+                        DateUtils.getTodayDate()
+                    ), taskData.name
+                )
+
+            }
+
             val realm = Realm.open(homeDatabaseConfig)
             try {
-                realm.query<RecurringTaskRealm>("id == $0", taskData.id).first().find()
+                realm.query<RecurringTaskRealm>("id == $0", RealmUUID.from(taskData.id))
+                    .first()
+                    .find()
                     ?.also { task ->
                         realm.writeBlocking {
                             if (findLatest(task)?.completed != null) {

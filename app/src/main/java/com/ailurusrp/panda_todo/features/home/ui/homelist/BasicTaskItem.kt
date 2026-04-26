@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ailurusrp.panda_todo.common.utils.DateUtils
+import com.ailurusrp.panda_todo.features.dailyreport.ui.DailyReportViewModel
+import com.ailurusrp.panda_todo.features.dailyreport.ui.DailyReportViewModelFactory
 import com.ailurusrp.panda_todo.features.home.data.database.homeDatabaseConfig
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.BasicTaskRealm
@@ -12,6 +14,7 @@ import com.ailurusrp.panda_todo.features.home.ui.HomeViewModel
 import com.ailurusrp.panda_todo.features.home.ui.HomeViewModelFactory
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.types.RealmUUID
 
 @Composable
 fun BasicTaskItem(
@@ -21,14 +24,34 @@ fun BasicTaskItem(
 
     val taskChecked = remember { mutableStateOf(taskData.completed) }
 
+    val dailyReportViewModel: DailyReportViewModel =
+        viewModel(factory = DailyReportViewModelFactory())
+
     HomeListItem(
         taskData,
         taskChecked = taskChecked,
 
         onCheckedChange = {
+            if (taskChecked.value) {
+                dailyReportViewModel.deleteCompletedTaskFromDailyReport(
+                    DateUtils.format(
+                        DateUtils.getTodayDate()
+                    ), taskData.name
+                )
+            } else {
+                dailyReportViewModel.addNewCompletedTaskToDailyReportOrAddDailyReport(
+                    DateUtils.format(
+                        DateUtils.getTodayDate()
+                    ), taskData.name
+                )
+            }
+
             val realm = Realm.open(homeDatabaseConfig)
             try {
-                realm.query<BasicTaskRealm>("id == $0", taskData.id).first().find()?.also { task ->
+                realm.query<BasicTaskRealm>(
+                    "id == $0",
+                    RealmUUID.from(taskData.id)
+                ).first().find()?.also { task ->
                     realm.writeBlocking {
                         if (findLatest(task)?.completed != null) {
                             if (findLatest(task)?.completed == true) {

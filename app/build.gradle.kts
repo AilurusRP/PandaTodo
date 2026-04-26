@@ -99,5 +99,5 @@ dependencies {
     implementation(libs.realm.kotlin.base)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.serialization.json)
-
+    implementation(libs.androidx.navigation.compose)
 }

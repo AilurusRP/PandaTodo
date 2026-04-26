@@ -10,7 +10,6 @@ import com.ailurusrp.panda_todo.features.home.data.model.BasicTask
 import com.ailurusrp.panda_todo.features.home.data.model.RecurringTask
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadline
 import com.ailurusrp.panda_todo.features.home.ui.FilterMenuOptions
-import com.ailurusrp.panda_todo.common.ui.HomeViews
 
 @Composable
 fun HomeList(

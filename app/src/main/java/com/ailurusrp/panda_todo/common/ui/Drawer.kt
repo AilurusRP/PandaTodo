@@ -1,11 +1,16 @@
 package com.ailurusrp.panda_todo.common.ui
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.ailurusrp.panda_todo.features.backup.data.BackupRepository
 import com.ailurusrp.panda_todo.features.backup.ui.BackupEvent
 import com.ailurusrp.panda_todo.features.backup.ui.BackupViewModel
@@ -39,7 +46,7 @@ import io.realm.kotlin.Realm
 import kotlinx.coroutines.launch
 
 @Composable
-fun Drawer() {
+fun Drawer(currentView: Views, navController: NavController) {
     val viewModel: BackupViewModel = viewModel<BackupViewModel> {
         BackupViewModel(
             BackupRepository(
@@ -49,6 +56,8 @@ fun Drawer() {
             )
         )
     }
+
+    var selectedView by remember { mutableStateOf(currentView) }
 
     val globalSnackbar = LocalSnackbarHostState.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -115,8 +124,46 @@ fun Drawer() {
     }
 
     ModalDrawerSheet(drawerContainerColor = Color.White) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(.75f)
+                .padding(vertical = 8.dp)
+        ) {
             Text("Views", fontSize = 26.sp, fontWeight = FontWeight.Bold)
+
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+            ) {
+                Views.entries.forEach { view ->
+                    if (selectedView == view) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(36.dp)
+                                .background(color = Color.LightGray.copy(alpha = .4f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(fontSize = 20.sp, text = view.text)
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(36.dp)
+                                .clickable(
+                                    onClick = {
+                                        selectedView = view
+                                        navController.navigate(view.nav)
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(fontSize = 20.sp, text = view.text)
+                        }
+                    }
+                }
+            }
         }
 
         HorizontalDivider(
@@ -156,6 +203,6 @@ fun Drawer() {
     }
 }
 
-enum class HomeViews(val text: String) {
-    OpenTasks("Open Tasks"), CompletedTasks("Completed Tasks")
+enum class Views(val text: String, val nav: String) {
+    Home("Home", "home"), DailyReport("Daily Report", "daily_report")
 }

@@ -6,11 +6,11 @@ import com.ailurusrp.panda_todo.features.home.data.model.SubTaskRealm
 import com.ailurusrp.panda_todo.features.home.data.model.TaskWithDeadlineRealm
 import io.realm.kotlin.RealmConfiguration
 
-val homeDatabaseConfig = RealmConfiguration.create(
+val homeDatabaseConfig = RealmConfiguration.Builder(
     setOf(
         BasicTaskRealm::class,
         RecurringTaskRealm::class,
         TaskWithDeadlineRealm::class,
         SubTaskRealm::class
     )
-)
+).name("home_data").build()

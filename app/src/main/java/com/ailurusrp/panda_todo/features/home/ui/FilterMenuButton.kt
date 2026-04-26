@@ -60,8 +60,6 @@ fun FilterMenuButton(viewModel: HomeViewModel = viewModel(factory = HomeViewMode
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = LocalIndication.current,
                                     onClick = {
                                         viewModel.changeSelectedFilterOption(filterMenuOption)
                                         filterMenuExpanded.value = false
