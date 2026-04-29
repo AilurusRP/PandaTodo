@@ -12,7 +12,9 @@ class DateUtils {
         @JvmStatic
         fun getTodayDate(): Long {
             val zone: ZoneId = ZoneId.systemDefault()
-            return LocalDate.now(zone).atStartOfDay(zone).toInstant().toEpochMilli()
+            return  LocalDateTime.now(zone).minusHours(2).toLocalDate().atStartOfDay(zone)
+                .toInstant()
+                .toEpochMilli() // 将一天的起点设为2:00
         }
 
         @JvmStatic
