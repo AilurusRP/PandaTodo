@@ -30,6 +30,8 @@ class RecurringTask(
                 ResetInterval.OneDay -> creationDate.plusDays(daysSinceCreation + 1)
                 ResetInterval.TwoDays -> creationDate.plusDays(daysSinceCreation + (2 - daysSinceCreation % 2))
                 ResetInterval.ThreeDays -> creationDate.plusDays(daysSinceCreation + (3 - daysSinceCreation % 3))
+                ResetInterval.FourDays -> creationDate.plusDays(daysSinceCreation + (4 - daysSinceCreation % 4))
+                ResetInterval.FiveDays -> creationDate.plusDays(daysSinceCreation + (5 - daysSinceCreation % 5))
                 ResetInterval.OneWeek -> creationDate.plusDays(daysSinceCreation + (7 - daysSinceCreation % 7))
                 ResetInterval.TwoWeeks -> creationDate.plusDays(daysSinceCreation + (14 - daysSinceCreation % 14))
                 ResetInterval.OneMonth -> {
@@ -63,6 +65,8 @@ class RecurringTask(
                     ResetInterval.OneDay -> DateUtils.getTodayDate() != completionDate
                     ResetInterval.TwoDays -> daysSinceCreation / 2 > daysBetweenCreationAndCompletion / 2
                     ResetInterval.ThreeDays -> daysSinceCreation / 3 > daysBetweenCreationAndCompletion / 3
+                    ResetInterval.FourDays -> daysSinceCreation / 4 > daysBetweenCreationAndCompletion / 4
+                    ResetInterval.FiveDays -> daysSinceCreation / 5 > daysBetweenCreationAndCompletion / 5
                     ResetInterval.OneWeek -> daysSinceCreation / 7 > daysBetweenCreationAndCompletion / 7
                     ResetInterval.TwoWeeks -> daysSinceCreation / 14 > daysBetweenCreationAndCompletion / 14
 
