@@ -29,13 +29,19 @@ class HomeViewModel(private val repository: TaskRepository) : ViewModel() {
 
     private fun loadTasks() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isRecurringTaskLoading = true) }
             launch {
                 repository.getRecurringTasks()
                     .catch { err ->
                         err.message?.let { Log.e("LoadTaskError", it) }
                     }
                     .collect { tasks ->
-                        _uiState.update { it.copy(recurringTaskData = tasks) }
+                        _uiState.update {
+                            it.copy(
+                                recurringTaskData = tasks,
+                                isRecurringTaskLoading = false
+                            )
+                        }
                     }
             }
 

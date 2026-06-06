@@ -51,7 +51,7 @@ fun HomeScreen(
         else drawerState.close()
     }
 
-    LaunchedEffect(uiState.selectedMenuOptions) {
+    LaunchedEffect(uiState.isRecurringTaskLoading) {
         uiState.recurringTaskData.forEach { taskData ->
             if (taskData.needUpdateCompletionStatus) {
                 viewModel.updateRecurringTaskCompletionState(RealmUUID.from(taskData.id), false)
